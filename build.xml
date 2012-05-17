@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="hw2" default="dist">
+
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  
+  <!-- codebase properties not needed for hw2?-->
+
+	
+  <target name="compile" description="compile the source">
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>  
+  
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="dist" depends="compile" description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Make computer jar file -->
+    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/** workpool/**"/>
+    
+    <!-- Make client jar file -->
+    <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/**"/>
+  	
+  	<!-- Make the space jar file -->
+  	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** workpool/**"/>
+	</target>
+  	<target name="javadoc" description="create javadocs">
+  		<javadoc packagenames="tasks.*,api.*" sourcepath="${src}" destdir="documents/javadoc" />
+ 	</target>
+  
+  	<target name="runComputer" description="run computer" >
+  		<java classname="system.ComputerImpl" fork="true">
+  	 		<jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+  	 <classpath>
+  	    <pathelement location="dist/computer.jar"/>
+  	  </classpath>
+  	</java>
+	</target>
+
+    <target name="runComputerP" description="run computer" >
+        <java classname="system.ComputerImpl" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <arg value="8888"/>
+            <arg value="-p"/>
+            <classpath>
+                <pathelement location="dist/computer.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runComputerL" description="run computer" >
+        <java classname="system.ComputerImpl" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <arg value="8888"/>
+            <arg value="-np"/>
+            <arg value="-l"/>
+            <classpath>
+                <pathelement location="dist/computer.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runComputerPL" description="run computer" >
+        <java classname="system.ComputerImpl" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <arg value="8888"/>
+            <arg value="-p"/>
+            <arg value="-l"/>
+            <classpath>
+                <pathelement location="dist/computer.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+	<target name="runSpace" description="run space" >
+		<java classname="system.SpaceImpl" fork="true">
+			<jvmarg value="-Djava.security.policy=policy"/>
+            <jvmarg value="-Xmx1000m"/>
+			<classpath>
+				<pathelement location="dist/space.jar"/>
+			</classpath>
+		</java>
+	</target>  
+
+	<target name="runTspClient" description="run client" >
+	        <java classname="client.Tsp" fork="true">
+	            <jvmarg value="-Djava.security.policy=policy"/>
+	            <arg value="localhost"/>
+	            <classpath>
+	                <pathelement location="dist/client.jar"/>
+	            </classpath>
+	        </java>
+	</target>
+
+	   <target name="runMandelClient" description="run client" >
+	        <java classname="client.Mandelbrot" fork="true">
+	            <jvmarg value="-Djava.security.policy=policy"/>
+	            <arg value="localhost"/>
+	            <classpath>
+	                <pathelement location="dist/client.jar"/>
+	            </classpath>
+	        </java>
+	    </target>
+
+    <target name="runFibClient" description="run client" >
+        <java classname="client.Fib" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <classpath>
+                <pathelement location="dist/client.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+
+  <target name="clean" description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+ 
+  
+</project>
+
