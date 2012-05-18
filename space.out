@@ -1,7 +1,0 @@
-Buildfile: /Users/gronnbeck/Development/concjava/hw5/build.xml
-
-runSpace:
-     [java] Space running!
-     [java] Worker ready
-     [java] Started
-     [java] The space computer is successfully registred!
