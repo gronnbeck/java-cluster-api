@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="hw2" default="dist">
+<project name="hw5" default="dist">
 
   <!-- set global properties for this build -->
   <property name="src" location="src"/>

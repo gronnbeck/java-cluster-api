@@ -3,6 +3,7 @@ package system;
 import java.rmi.RemoteException;
 
 import api.Computer;
+import api.Result;
 import api.Space;
 import api.Task;
 
@@ -20,9 +21,9 @@ public class SpaceComputer  extends ComputerProxy implements Runnable{
 		do{
 			try {
                 Task task = space.takeSimpleTask();
-                addTask(task); 
                 try {
-                	execute(task);
+                	Result r = execute(task);
+                    space.putResult(r);
                 } catch (RemoteException e) {
                     System.out.println("WTF!?");
 					return;          // exit thread

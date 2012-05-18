@@ -13,7 +13,7 @@ public interface Computer extends Remote, Serializable {
      * Executes its given task
      * @param task the task to be executed
      */
-    void execute(Task task) throws RemoteException;
+    Result execute(Task task) throws RemoteException;
 
     /**
      * Stops the computer

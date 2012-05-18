@@ -188,7 +188,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 				//So far this doesn't solve normal task. Only tasks that are marked as simple
 				//TODO: Add support for normal tasks as well!
 				//Currently all continuation tasks are set to simple.. So all the contination tasks will be executed in space!
-				Computer comp = new ComputerImpl(1, false);
+				Computer comp = new ComputerImpl(this);
 				SpaceComputer spaceComputer = new SpaceComputer(comp,this);
 				this.registerSpaceComputer(spaceComputer);
 				
