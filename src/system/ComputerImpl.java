@@ -8,10 +8,11 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
 import api.*;
 
-public class ComputerImpl extends UnicastRemoteObject implements Computer {
+public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
     private Shared shared;
@@ -49,9 +50,28 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer {
 			String urlString = "rmi://"+url+":"+port+"/"+Space.SERVICE_NAME;
 			System.out.println("Connecting to " + url + ":" + port + ". ");
 			//Registry registry = LocateRegistry.getRegistry(url,port);
-			Space space = (Space) Naming.lookup(urlString);  //Dette er vel ikke riktig!?
-            ComputerImpl computer = new ComputerImpl(space);
-            space.register(computer);
+			final Space space = (Space) Naming.lookup(urlString);
+
+            // en hack for å starte Computer i en tråd.
+            for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ComputerImpl computer = null;
+                        try {
+                            computer = new ComputerImpl(space);
+                            space.register(computer);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                            System.exit(1);
+                        }
+
+                    }
+                });
+                t.start();
+                System.out.println("Computer #"+(i + 1)+ " started.");
+            }
+
 			System.out.println("Computer successfully registered!");
 		} catch (Exception e) {
 			System.out.println("Something went wrong!");
