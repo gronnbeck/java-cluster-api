@@ -25,6 +25,20 @@ public class TspTask extends TaskImpl implements Serializable  {
     private boolean simple;
 
 
+    private static ArrayList<Integer> initPath(int i) {
+        ArrayList<Integer> path = new ArrayList<Integer>();
+        path.add(i);
+        return path;
+    }
+
+    private static ArrayList<Integer> initCities(double[][] coordinates) {
+        ArrayList<Integer> cities = new ArrayList<Integer>();
+        for (int i = 1; i < coordinates.length; i++){
+            cities.add(i);
+        }
+        return cities;
+    }
+
 	/**
      * Instantiates a Task for solving a Euclidean TSP problem
      * @param coordinates A two dimensional double array which contains the coordinates
@@ -32,18 +46,9 @@ public class TspTask extends TaskImpl implements Serializable  {
      *                    are used to calculate the shortest possible path for the TSP problem.
      */
     public TspTask(double[][] coordinates) {
+        this(coordinates, initCities(coordinates), 0, 0, initPath(0));
         this.tspBaseCase = coordinates.length - levels;
-        this.coordinates = coordinates;
-        cities = new ArrayList<Integer>();
-        for (int i = 1; i < coordinates.length; i++){
-            cities.add(i);
-        }
-        this.cost = 0;
-        this.currentCity = 0;
-        path = new ArrayList<Integer>();
-        path.add(0);
-        lowerbound = new TspLowerBound(coordinates, path); // For now a pretty stupid lowerbound method
-        simple = false;
+        lowerbound = new TspLowerBound(coordinates, initPath(0)); // For now a pretty stupid lowerbound method
     }
 
 
@@ -58,6 +63,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         this.currentCity = currentCity;
         this.path.add(currentCity);
         lowerbound = new TspLowerBound(coordinates, this.path); // For now a pretty stupid lowerbound method
+        simple = false;
     }
 
 

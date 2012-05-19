@@ -67,11 +67,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TspTask.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="TspTask.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/tasks/TspTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="172" column="7" selection-start="6368" selection-end="6368" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="50" column="8" selection-start="1592" selection-end="1592" vertical-scroll-proportion="0.6022305">
+              <folding>
+                <element signature="e#742#751#0" expanded="true" />
+                <element signature="e#928#937#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -112,10 +115,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FibContin.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="FibContin.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/tasks/FibContin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="52" column="4" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.7100372">
+            <state line="52" column="4" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -172,8 +175,8 @@
         <option value="$PROJECT_DIR$/src/client/Tsp.java" />
         <option value="$PROJECT_DIR$/src/tasks/TspContin.java" />
         <option value="$PROJECT_DIR$/src/tasks/MandelContin.java" />
-        <option value="$PROJECT_DIR$/src/tasks/TspTask.java" />
         <option value="$PROJECT_DIR$/src/tasks/FibContin.java" />
+        <option value="$PROJECT_DIR$/src/tasks/TspTask.java" />
       </list>
     </option>
   </component>
@@ -703,13 +706,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/Tsp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="2" selection-start="1859" selection-end="1859" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/tasks/TspContin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="84" column="5" selection-start="2405" selection-end="2405" vertical-scroll-proportion="0.0">
@@ -727,13 +723,6 @@
     <entry file="file://$PROJECT_DIR$/src/tasks/MandelContin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="34" column="53" selection-start="880" selection-end="880" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tasks/TspTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="172" column="7" selection-start="6368" selection-end="6368" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -761,8 +750,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/tasks/FibContin.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="4" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.7100372">
+        <state line="52" column="4" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/Tsp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="70" column="2" selection-start="1859" selection-end="1859" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tasks/TspTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="8" selection-start="1592" selection-end="1592" vertical-scroll-proportion="0.6022305">
+          <folding>
+            <element signature="e#742#751#0" expanded="true" />
+            <element signature="e#928#937#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
