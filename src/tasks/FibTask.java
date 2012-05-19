@@ -17,7 +17,6 @@ public class FibTask extends TaskImpl {
 
 
     private int num;
-    private String id;
     private boolean simple;
 
     /**
@@ -25,9 +24,8 @@ public class FibTask extends TaskImpl {
      * @param num the n-th number of the sequence you want to be computed
      */
     public FibTask(int num) {
+        super();
         this.num = num;
-        UUID uuid = UUID.randomUUID();
-        this.id = this.toString() +  uuid.toString();
         this.simple = false;
         
     }
@@ -44,11 +42,6 @@ public class FibTask extends TaskImpl {
         tasks.add(fib2);
         
         return new ContinuationResult(new FibContin(tasks, getTaskIdentifier()));
-    }
-
-    @Override
-    public String getTaskIdentifier() {      // Don't know if it necessary to use MD5 as identifier...
-        return id;
     }
 
 	@Override

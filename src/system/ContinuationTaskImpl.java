@@ -12,7 +12,8 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     protected ArrayList<Result> results;
     protected ArrayList<Task> tasks;
 
-    public ContinuationTaskImpl(ArrayList<Task> tasks) {
+    public ContinuationTaskImpl(ArrayList<Task> tasks, String id) {
+        setTaskIdentifier(id);
         results = new ArrayList<Result>();
         this.tasks = tasks;
         elapsedTime = 0;

@@ -18,7 +18,6 @@ public class TspTask extends TaskImpl implements Serializable  {
     private double[][] coordinates;
     private ArrayList<Integer> cities;
     private ArrayList<Integer> prefix;
-    private String id;
     private ArrayList<Integer> path;
     private double cost;
     private int currentCity;
@@ -39,7 +38,6 @@ public class TspTask extends TaskImpl implements Serializable  {
         for (int i = 1; i < coordinates.length; i++){
             cities.add(i);
         }
-        id = this.toString() + UUID.randomUUID().toString();
         this.cost = 0;
         this.currentCity = 0;
         path = new ArrayList<Integer>();
@@ -56,7 +54,6 @@ public class TspTask extends TaskImpl implements Serializable  {
         this.coordinates = coordinates;
         cities = citiesNotVisited;
         this.path = path;
-        id = this.toString() + UUID.randomUUID().toString();
         this.cost = cost;
         this.currentCity = currentCity;
         this.path.add(currentCity);
@@ -108,7 +105,7 @@ public class TspTask extends TaskImpl implements Serializable  {
       //  System.out.println(path.size());
       //  System.out.println(lowerbound.getLowerBound() + " > " + getSharedValue());
         if (lowerbound.getLowerBound() > getSharedValue()) {
-            return new PruneResult(id);
+            return new PruneResult(getTaskIdentifier());
         }
 
          if (cities.size() < tspBaseCase) {
@@ -128,7 +125,7 @@ public class TspTask extends TaskImpl implements Serializable  {
                  }
              }
 
-             return new TspResult(minPath, minCost, id);
+             return new TspResult(minPath, minCost, getTaskIdentifier());
          }
 
         ArrayList<Task> subtasks = new ArrayList<Task>();
@@ -141,7 +138,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         }
 
         // TODO return a special case Result instead where the task will continue
-        return new ContinuationResult(new TspContin(currentCity, subtasks, id));
+        return new ContinuationResult(new TspContin(currentCity, subtasks, getTaskIdentifier()));
 
     }
 
@@ -189,12 +186,6 @@ public class TspTask extends TaskImpl implements Serializable  {
 
     private double getLowerboundCost(double[][] coordinates, ArrayList<Integer> prefix) {
         return new TspLowerBound(coordinates, prefix).getLowerBound();
-    }
-
-
-    @Override
-    public String getTaskIdentifier() {
-        return id;
     }
 
 

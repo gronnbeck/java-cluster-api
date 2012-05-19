@@ -13,14 +13,13 @@ public class TspContin extends ContinuationTaskImpl {
 
 
     private HashMap<String, Task> taskMap;
-    private String id;
     private int currentCity;
     private boolean simple;
 
   
 
 	public TspContin(int currentCity, ArrayList<Task> tasks, String id) {
-        super(tasks);
+        super(tasks, id);
         this.currentCity = currentCity;
         results = new ArrayList<Result>();
         this.tasks = tasks;
@@ -28,7 +27,6 @@ public class TspContin extends ContinuationTaskImpl {
         for (Task t : tasks) {
             taskMap.put(t.getTaskIdentifier(), t);
         }
-        this.id = id;
         simple = true;
 
     }
@@ -57,7 +55,7 @@ public class TspContin extends ContinuationTaskImpl {
     @Override
     public Result<TspResult> execute() {
 
-        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE, id);
+        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE, getTaskIdentifier());
         double minCost = Double.MAX_VALUE;
 
         for (Result currentResult : results) {
@@ -79,19 +77,12 @@ public class TspContin extends ContinuationTaskImpl {
 
         path.add(0, currentCity);
 
-        Result result = new TspResult(path, minCost, id);
+        Result result = new TspResult(path, minCost, getTaskIdentifier());
         //Hmm this one will probably be overwritten. TODO look into it
         result.setTaskRunTime(getTaskRunTime());
         return result;
 
     }
-
-
-
-    @Override
-	public String getTaskIdentifier() {
-		return id;
-	}
 
 	@Override
 	public boolean isSimple() {

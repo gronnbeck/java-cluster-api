@@ -28,7 +28,7 @@ public class MandelContin extends ContinuationTaskImpl {
      * @param id the id of the task that should be continued
      */
 	public MandelContin(ArrayList<Task> tasks,String id){
-        super(tasks);
+        super(tasks,id);
 		this.tasks = tasks;
 		this.id = id;
 		this.simple = false;
