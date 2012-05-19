@@ -1,7 +1,5 @@
 package api;
 
-import system.TaskImpl;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -13,7 +11,7 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      * @param task To put into the computer space
      * @throws RuntimeException
      */
-    void put(Task task) throws RuntimeException, RemoteException, InterruptedException;
+    void put(Task<?> task) throws RuntimeException, RemoteException, InterruptedException;
 
     /**
      * Takes a result from the space. If no result
@@ -22,7 +20,7 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      * @return A result in the Computer Space
      * @throws java.rmi.RemoteException
      */
-    Result take() throws RemoteException, InterruptedException;
+    Result<?> take() throws RemoteException, InterruptedException;
 
     /**
      * First stops all the Computers in Space, then it shuts it self down
@@ -37,6 +35,6 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      * @param shared
      */
     
-    void setShared(Shared shared) throws RemoteException;
+    void setShared(Shared<?> shared) throws RemoteException;
 
 }

@@ -7,7 +7,7 @@ public interface Task<T> extends Serializable {
      * Executes the given task
      * @return The tasks result
      */
-    Result execute();
+    Result<?> execute();
 
     /**
      * Returns the tasks identifier

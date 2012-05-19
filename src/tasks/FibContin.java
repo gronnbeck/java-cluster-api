@@ -4,10 +4,8 @@ import api.ContinuationTask;
 import api.Result;
 import api.Task;
 import api.Task2Space;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-
 import system.ContinuationTaskImpl;
 
 public class FibContin extends ContinuationTaskImpl {

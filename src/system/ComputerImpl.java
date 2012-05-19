@@ -1,30 +1,23 @@
 package system;
 
-
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.Executor;
-
 import api.*;
 
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
-    private Shared shared;
+    private Shared<?> shared;
+    
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public Result execute(Task task) throws RemoteException {
-        ((TaskImpl)task).setComputer(this);
+	public Result<?> execute(Task<?> task) throws RemoteException {
+        task.setComputer(this);
         return task.execute();
 	}
 
@@ -78,8 +71,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 			e.printStackTrace();
 		}
 
-
-
 	}
 
 	@Override
@@ -87,6 +78,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 		return shared;
 	}
 
+	
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
         if (shared.isNewerThan(this.shared)) {
             this.shared = shared;

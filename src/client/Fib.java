@@ -1,7 +1,5 @@
 package client;
 
-import api.Result;
-import api.Task;
 import api.Space;
 import tasks.*;
 import java.rmi.registry.*;
@@ -17,11 +15,11 @@ public class Fib {
         Registry registry = LocateRegistry.getRegistry(url, port);
 
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
-        Task fibTask = new FibTask(NTH_NUMBER);
+        FibTask fibTask = new FibTask(NTH_NUMBER);
 
         long clientRunTime = System.nanoTime();
         space.put(fibTask);
-        Result result = space.take();
+        FibResult result = (FibResult)space.take();
         System.out.println(NTH_NUMBER + "th number of fib: " + result.getTaskReturnValue());
         System.out.println("Runtime: " + result.getTaskRunTime());
         System.out.println("Client time: " + (System.nanoTime() - clientRunTime));

@@ -8,18 +8,12 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-
-import api.Task;
 import tasks.*;
-
-import api.Result;
 import api.Space;
-import api.Task;
 
 public class Mandelbrot {
 	
@@ -68,10 +62,10 @@ public class Mandelbrot {
 		 String id = "0";
 		 //Start time - CLIENT
 		 
-		 Task MandelTask = new MandelTask(id,lowerX,lowerY,edge,n,iteration_limit);
+		 MandelTask MandelTask = new MandelTask(id,lowerX,lowerY,edge,n,iteration_limit);
 		 long jobExecTime = System.nanoTime();
 		 space.put(MandelTask);
-		 Result res = space.take();
+		 MandelResult res = (MandelResult)space.take();
 		 jobExecTime = System.nanoTime() - jobExecTime;
 		 count = (int[][])res.getTaskReturnValue();
 		 //End time - CLIENT

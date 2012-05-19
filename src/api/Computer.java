@@ -1,7 +1,5 @@
 package api;
 
-import system.TaskImpl;
-
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -13,7 +11,7 @@ public interface Computer extends Remote, Serializable {
      * Executes its given task
      * @param task the task to be executed
      */
-    Result execute(Task task) throws RemoteException;
+    Result<?> execute(Task<?> task) throws RemoteException;
 
     /**
      * Stops the computer
@@ -33,7 +31,7 @@ public interface Computer extends Remote, Serializable {
 	 * This value is used to prune the search tree. 
 	 * @param shared
 	 */
-	void setShared(Shared shared) throws RemoteException;
+	void setShared(Shared<?> shared) throws RemoteException;
 	
 	
     Space getSpace() throws RemoteException;

@@ -3,7 +3,6 @@ package system;
 
 import api.ContinuationTask;
 import api.Result;
-import com.sun.tools.doclets.internal.toolkit.util.SourceToHTMLConverter;
 
 public class ContinuationResult implements Result<ContinuationTask> {
 
