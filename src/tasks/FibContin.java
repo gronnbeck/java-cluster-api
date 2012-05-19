@@ -14,7 +14,6 @@ public class FibContin extends ContinuationTaskImpl {
 
     private int counter;
     private boolean simple;
-    private String id;
 
     public FibContin(ArrayList<Task> tasks, String id) {
         super(tasks, id);
@@ -46,15 +45,10 @@ public class FibContin extends ContinuationTaskImpl {
         for (Result<Integer> res : results) {
             sum += res.getTaskReturnValue();
         }
-        Result<Integer> result = new FibResult(sum, id);
+        Result<Integer> result = new FibResult(sum, getTaskIdentifier());
         result.setTaskRunTime(getTaskRunTime());
 
         return result;
-    }
-
-    @Override
-    public String getTaskIdentifier() {
-        return id;
     }
 
 	@Override
