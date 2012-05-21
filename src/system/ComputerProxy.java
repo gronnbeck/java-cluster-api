@@ -66,8 +66,9 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
      * task back into the space, and deregisters it self.
      */
     public void run() {
-        System.out.println("ComputerProxy running");
+        // TODO Clean!
         // I think this method has become too complex. Is there a way we can simply it?
+        System.out.println("ComputerProxy running");
         do {
             try {
                 Result result = null;
@@ -99,7 +100,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 }
                 if (result instanceof ContinuationResult) {
                     // One should not be able to access the ContinuationTask in this way. Its error-prone.
-                    // TODO find a better way to mark tasks as cached
+                    // TODO find a better way to retrieve tasks marked as cached
                     ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
                     ArrayList<Task> tasks = continuationTask.getTasks();
                     Task task;

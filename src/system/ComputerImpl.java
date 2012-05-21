@@ -31,6 +31,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	public Result execute(Task task) throws RemoteException {
         task.setComputer(this);
         Result result = task.execute();
+        // TODO This part can be more elegant
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
             ArrayList<Task> tasks = continuationTask.getTasks();
@@ -41,10 +42,12 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
         return result;
 	}
 
+    @Override
     public boolean hasCached() {
         return cached != null;
     }
 
+    @Override
     public  Result executeCachedTask() throws RemoteException {
         System.out.println("Running a cached task");
         // hate too return _null_. Fix later
