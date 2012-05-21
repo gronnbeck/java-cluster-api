@@ -3,6 +3,8 @@ package system;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+
 import api.*;
 
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
@@ -19,7 +21,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
         task.setComputer(this);
-<<<<<<< HEAD
         Result result = task.execute();
         // TODO This part can be more elegant
         if (result instanceof ContinuationResult) {
@@ -29,9 +30,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             cached.setCached(true);
         }
         return result;
-=======
-        return task.execute();
->>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
 	}
 
     @Override

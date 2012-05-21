@@ -1,5 +1,6 @@
 package client;
 
+import api.Result;
 import api.Space;
 import tasks.*;
 import java.rmi.registry.*;
