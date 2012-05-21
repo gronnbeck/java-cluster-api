@@ -19,12 +19,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 	private BlockingQueue<Task<?>> simpleTaskQue;
     private HashMap<Object,ContinuationTask> mapContin;
     private ArrayList<Computer> computers;
-<<<<<<< HEAD
-    private Shared shared;
     private HashMap<String, BlockingQueue<Result>> resultQs;
-=======
     private Shared<?> shared;
->>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
 
     public SpaceImpl() throws RemoteException {
         super();
@@ -50,7 +46,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-<<<<<<< HEAD
     public void publishTask(Task task) throws RemoteException, InterruptedException {
         resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
         put(task);
@@ -59,10 +54,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     @Override
     public Result takeResult(String id) throws RemoteException, InterruptedException {
         return resultQs.get(id).take();
-=======
-    public Result<?> take() throws RemoteException, InterruptedException {
-        return resultQue.take();
->>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
     }
 
     @Override
