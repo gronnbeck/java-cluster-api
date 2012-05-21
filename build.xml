@@ -14,7 +14,7 @@
     <mkdir dir="${build}"/>  
   
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}" includeantruntime="false"/>
   </target>
 
   <target name="dist" depends="compile" description="generate the distribution" >

@@ -14,20 +14,24 @@ import api.*;
 public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 
 	private static final long serialVersionUID = 1L;
-	private BlockingQueue<Result> resultQue;
-	private BlockingQueue<Task> taskQue;
-	private BlockingQueue<Task> simpleTaskQue;
+	private BlockingQueue<Result<?>> resultQue;
+	private BlockingQueue<Task<?>> taskQue;
+	private BlockingQueue<Task<?>> simpleTaskQue;
     private HashMap<Object,ContinuationTask> mapContin;
     private ArrayList<Computer> computers;
+<<<<<<< HEAD
     private Shared shared;
     private HashMap<String, BlockingQueue<Result>> resultQs;
+=======
+    private Shared<?> shared;
+>>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
 
     public SpaceImpl() throws RemoteException {
         super();
         computers = new ArrayList<Computer>();
-        taskQue = new LinkedBlockingQueue<Task>();
-        simpleTaskQue = new LinkedBlockingQueue<Task>();
-        resultQue = new LinkedBlockingQueue<Result>();
+        taskQue = new LinkedBlockingQueue<Task<?>>();
+        simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
+        resultQue = new LinkedBlockingQueue<Result<?>>();
         mapContin = new HashMap<Object, ContinuationTask>();
 
         resultQs = new HashMap<String, BlockingQueue<Result>>();
@@ -37,7 +41,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-    public void put(Task task) throws RuntimeException, RemoteException, InterruptedException {
+    public void put(Task<?> task) throws RuntimeException, RemoteException, InterruptedException {
         if (task.isSimple()) {
 			simpleTaskQue.put(task);
 			return;
@@ -46,6 +50,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
+<<<<<<< HEAD
     public void publishTask(Task task) throws RemoteException, InterruptedException {
         resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
         put(task);
@@ -54,15 +59,19 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     @Override
     public Result takeResult(String id) throws RemoteException, InterruptedException {
         return resultQs.get(id).take();
+=======
+    public Result<?> take() throws RemoteException, InterruptedException {
+        return resultQue.take();
+>>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
     }
 
     @Override
-    public Task takeTask() throws RemoteException, InterruptedException {
+    public Task<?> takeTask() throws RemoteException, InterruptedException {
         return taskQue.take();
     }
   
     @Override
-    public Task takeSimpleTask() throws InterruptedException{
+    public Task<?> takeSimpleTask() throws InterruptedException{
     	return simpleTaskQue.take();
     }
     
@@ -77,7 +86,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
         Computer proxy = new ComputerProxy(computer, this);
-        if(this.shared !=null)	proxy.setShared(this.shared);
+        if(this.shared != null) proxy.setShared(this.shared);
         computers.add(proxy);
         System.out.println("A computer has registered it self");
     }

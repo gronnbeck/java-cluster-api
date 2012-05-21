@@ -1,11 +1,10 @@
 package client;
 
-import api.Result;
-import api.Task;
 import api.Space;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
+import tasks.TspResult;
 import tasks.TspTask;
 
 import javax.swing.*;
@@ -83,11 +82,15 @@ public class Tsp {
         Double upperBound = findUpperBound(coord);
         space.setShared(new DoubleShared(upperBound+0.5));
         System.out.println("Upperbound: " + upperBound);
-        Task tspTask = new TspTask(coord);
+        TspTask tspTask = new TspTask(coord);
         long runTime = System.currentTimeMillis();
         space.put(tspTask);
         System.out.println("Task in space. Waiting for result");
+<<<<<<< HEAD
         Result result = null;                                         // fix this later
+=======
+        TspResult result = (TspResult)space.take();
+>>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

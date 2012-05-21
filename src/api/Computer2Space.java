@@ -1,7 +1,5 @@
 package api;
 
-import system.TaskImpl;
-
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -28,8 +26,8 @@ public interface Computer2Space extends Serializable, Remote {
      * @throws java.rmi.RemoteException
      * @throws InterruptedException
      */
-    Task takeTask() throws RemoteException, InterruptedException;
+    Task<?> takeTask() throws RemoteException, InterruptedException;
     
-    Task takeSimpleTask() throws RemoteException, InterruptedException;
+    Task<?> takeSimpleTask() throws RemoteException, InterruptedException;
 
 }

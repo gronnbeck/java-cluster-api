@@ -19,7 +19,7 @@ public interface ContinuationTask extends Task {
      * Save results of solved subtasks
      * @param result The result of a subtask
      */
-    void ready(Result result);
+    void ready(Result<?> result);
 
 
     /**

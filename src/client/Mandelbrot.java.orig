@@ -64,8 +64,13 @@ public class Mandelbrot {
 		 
 		 MandelTask MandelTask = new MandelTask(id,lowerX,lowerY,edge,n,iteration_limit);
 		 long jobExecTime = System.nanoTime();
+<<<<<<< HEAD
 		 space.publishTask(MandelTask);
 		 Result res = space.takeResult(MandelTask.getTaskIdentifier());
+=======
+		 space.put(MandelTask);
+		 MandelResult res = (MandelResult)space.take();
+>>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
 		 jobExecTime = System.nanoTime() - jobExecTime;
 		 count = (int[][])res.getTaskReturnValue();
 		 //End time - CLIENT

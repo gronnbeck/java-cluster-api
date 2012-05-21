@@ -13,6 +13,17 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      */
     void put(Task<?> task) throws RuntimeException, RemoteException, InterruptedException;
 
+<<<<<<< HEAD
+=======
+    /**
+     * Takes a result from the space. If no result
+     * are present in the space, the method blocks until
+     * it one appears.
+     * @return A result in the Computer Space
+     * @throws java.rmi.RemoteException
+     */
+    Result<?> take() throws RemoteException, InterruptedException;
+>>>>>>> 777b5fbb3b3393be56ce915a77e411849169d806
 
     /**
      * First stops all the Computers in Space, then it shuts it self down
