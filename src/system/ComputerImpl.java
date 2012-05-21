@@ -9,6 +9,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
     private Shared<?> shared;
+    private Task cached;
     
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
