@@ -81,6 +81,20 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
+    private void lookForCachedResult(Result result) {
+        if (result instanceof ContinuationResult) {
+            // One should not be able to access the ContinuationTask in this way. Its error-prone.
+            // TODO find a better way to retrieve tasks marked as cached
+            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
+            ArrayList<Task> tasks = continuationTask.getTasks();
+            Task task;
+            if ((task = tasks.get(0)).getCached() && this.cached == null) {
+                System.out.println("A Computer has cached a task");
+                this.cached = task;
+            }
+        }
+    }
+
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
@@ -121,17 +135,8 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     }
                 }
 
-                if (result instanceof ContinuationResult) {
-                    // One should not be able to access the ContinuationTask in this way. Its error-prone.
-                    // TODO find a better way to retrieve tasks marked as cached
-                    ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-                    ArrayList<Task> tasks = continuationTask.getTasks();
-                    Task task;
-                    if ((task = tasks.get(0)).getCached() && this.cached == null) {
-                        System.out.println("A Computer has cached a task");
-                        this.cached = task;
-                    }
-                }
+                lookForCachedResult(result);
+
             } catch (RemoteException e) {
                 System.out.println("A computer crashed before a task was scheduled.");
                 deregisterComputer();
