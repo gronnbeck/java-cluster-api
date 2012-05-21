@@ -58,11 +58,14 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    private void handleFaultyComputer(Task task) throws InterruptedException {
+    private void handleFaultyComputer(Task task)  {
         try {
             space.put(task);
             deregisterComputer();
         } catch (RemoteException ignore) { }
+          catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void deregisterComputer() {
@@ -89,12 +92,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             ArrayList<Task> tasks = continuationTask.getTasks();
             Task task;
             if ((task = tasks.get(0)).getCached() && this.cached == null) {
-                System.out.println("A Computer has cached a task");
                 this.cached = task;
             }
         }
     }
 
+    private boolean crashed;
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
@@ -104,26 +107,38 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
      * task back into the space, and deregisters it self.
      */
     public void run() {
+        crashed = false;
         // TODO Clean!
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
         do {
 
-                Result result = null;
-                // if computer has a cached task execute that one. If not get one from space
+            Result result = null;
+            // if computer has a cached task execute that one. If not get one from space
             try {
-                if (hasCached() && cached != null) {
-                    try {
-                        result = computer.executeCachedTask();
-                        if (result == null) continue;   // the cached task has already been executed. This should never happen since
-                                                        // Computer should be single threaded (Intended design)
-                    } catch (RemoteException e) {
-                        System.out.println("A computer has crashed. Putting the cached task back to space");
+                boolean hasCached;
+                try {
+                    hasCached = hasCached();
+                } catch (RemoteException e) {
+                    System.out.println("A computer crashed on checking if it had a cached task");
+                    if (cached != null) {
                         handleFaultyComputer(cached);
-                        return;
                     }
                     cached = null;
+                    return;
                 }
+                if (hasCached && cached != null) {
+                        try {
+                            result = computer.executeCachedTask();
+                            if (result == null) continue;   // the cached task has already been executed. This should never happen since
+                                                            // Computer should be single threaded (Intended design)
+                        } catch (RemoteException e) {
+                            System.out.println("A computer has crashed. Putting the cached task back to space");
+                            handleFaultyComputer(cached);
+                            return;
+                        }
+                        cached = null;
+                    }
                 else {
                     Task task = space.takeTask();
                     try {
@@ -134,17 +149,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                             return;          // exit thread . The proxy is no longer needed
                     }
                 }
-
-                lookForCachedResult(result);
-
-            } catch (RemoteException e) {
-                System.out.println("A computer crashed before a task was scheduled.");
-                deregisterComputer();
-                return;
             }
             catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
-            }
+            } catch (RemoteException ignore) {}
+
+            lookForCachedResult(result);
             putResultToSpace(result);
         } while(true);
     }
