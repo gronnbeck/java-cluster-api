@@ -33,9 +33,12 @@ public interface Computer extends Remote, Serializable {
 	 */
 	void setShared(Shared<?> shared) throws RemoteException;
 	
-	
+
+    boolean hasCached() throws RemoteException;
+
+    Result executeCachedTask() throws RemoteException;
+
+    // Dont know if we need this anymore?
     Space getSpace() throws RemoteException;
-
-
-	void setSpace(Space space) throws RemoteException ;
+	void setSpace(Space space) throws RemoteException;
 }

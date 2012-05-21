@@ -21,6 +21,21 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
         return task.execute();
 	}
 
+    @Override
+    public boolean hasCached() {
+        return cached != null;
+    }
+
+    @Override
+    public  Result executeCachedTask() throws RemoteException {
+        System.out.println("Running a cached task");
+        // hate too return _null_. Fix later
+        if (cached == null) return null;
+        Task task = cached;
+        cached = null;
+        return execute(task);
+    }
+
 	@Override
 	public void stop() throws RemoteException {
 		System.exit(0);		
@@ -104,6 +119,5 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     public void setSpace(Space space) throws RemoteException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
-
 
 }

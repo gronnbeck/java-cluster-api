@@ -1,6 +1,8 @@
 bin/
 dist/
 build/
+/.DS_Store
+/dist/*
 /.idea/*
 hw5.iml
 /out/*
