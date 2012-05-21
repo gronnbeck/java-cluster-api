@@ -1,8 +1,9 @@
+bin/
+dist/
+build/
 /.idea/*
 hw5.iml
 /out/*
-/build/*
 .classpath
 .project
 .settings/
-bin/
