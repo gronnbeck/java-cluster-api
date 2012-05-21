@@ -8,7 +8,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import api.*;
 
@@ -16,17 +18,41 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
     private Shared shared;
+    private Task cached;
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
+        cached = null;
+
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Result execute(Task task) throws RemoteException {
-        ((TaskImpl)task).setComputer(this);
-        return task.execute();
+        task.setComputer(this);
+        Result result = task.execute();
+        if (result instanceof ContinuationResult) {
+            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
+            ArrayList<Task> tasks = continuationTask.getTasks();
+            cached = tasks.get(0);
+            cached.setCached(true);
+            System.out.println("Cached a task for execution");
+        }
+        return result;
 	}
+
+    public boolean hasCached() {
+        return cached != null;
+    }
+
+    public  Result executeCachedTask() throws RemoteException {
+        System.out.println("Running a cached task");
+        // hate too return _null_. Fix later
+        if (cached == null) return null;
+        Task task = cached;
+        cached = null;
+        return execute(task);
+    }
 
 	@Override
 	public void stop() throws RemoteException {
@@ -112,6 +138,5 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     public void setSpace(Space space) throws RemoteException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
-
 
 }
