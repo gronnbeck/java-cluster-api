@@ -97,7 +97,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-    private boolean crashed;
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
@@ -107,7 +106,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
      * task back into the space, and deregisters it self.
      */
     public void run() {
-        crashed = false;
         // TODO Clean!
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
