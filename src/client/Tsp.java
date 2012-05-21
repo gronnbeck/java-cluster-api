@@ -87,7 +87,7 @@ public class Tsp {
         long runTime = System.currentTimeMillis();
         space.put(tspTask);
         System.out.println("Task in space. Waiting for result");
-        Result result = space.take();
+        Result result = null;                                         // fix this later
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

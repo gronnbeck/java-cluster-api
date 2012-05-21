@@ -1,7 +1,5 @@
 package api;
 
-import system.TaskImpl;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -15,14 +13,6 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      */
     void put(Task task) throws RuntimeException, RemoteException, InterruptedException;
 
-    /**
-     * Takes a result from the space. If no result
-     * are present in the space, the method blocks until
-     * it one appears.
-     * @return A result in the Computer Space
-     * @throws java.rmi.RemoteException
-     */
-    Result take() throws RemoteException, InterruptedException;
 
     /**
      * First stops all the Computers in Space, then it shuts it self down
@@ -38,5 +28,26 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      */
     
     void setShared(Shared shared) throws RemoteException;
+
+    /**
+     * This method should be invoked when a clients wants to publish a task to Space.
+     * @param task The task that should be published
+     * @throws java.rmi.RemoteException
+     * @throws java.lang.InterruptedException
+     */
+
+    void publishTask(Task task) throws RemoteException, InterruptedException;
+
+    /**
+     * Returns the result of a task. Uses the task identification string to find the correct
+     * result queue to fetch results from.
+     * @param id A task identification string
+     * @throws java.rmi.RemoteException
+     * @throws java.lang.InterruptedException
+     */
+    Result takeResult(String id) throws RemoteException, InterruptedException;
+
+
+
 
 }

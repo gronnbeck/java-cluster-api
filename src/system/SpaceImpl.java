@@ -1,8 +1,5 @@
 package system;
 
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -10,7 +7,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.*;
@@ -24,6 +20,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     private HashMap<Object,ContinuationTask> mapContin;
     private ArrayList<Computer> computers;
     private Shared shared;
+    private HashMap<String, BlockingQueue<Result>> resultQs;
 
     public SpaceImpl() throws RemoteException {
         super();
@@ -32,6 +29,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         simpleTaskQue = new LinkedBlockingQueue<Task>();
         resultQue = new LinkedBlockingQueue<Result>();
         mapContin = new HashMap<Object, ContinuationTask>();
+
+        resultQs = new HashMap<String, BlockingQueue<Result>>();
         
         Thread computerThread = new Thread(this);
         computerThread.start();
@@ -47,8 +46,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-    public Result take() throws RemoteException, InterruptedException {
-        return resultQue.take();
+    public void publishTask(Task task) throws RemoteException, InterruptedException {
+        resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
+        put(task);
+    }
+
+    @Override
+    public Result takeResult(String id) throws RemoteException, InterruptedException {
+        return resultQs.get(id).take();
     }
 
     @Override
@@ -115,7 +120,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         // if not it is probably the end result (as I see it now)
         // in the case of fib. It should just be 1 number left
         else {
-            resultQue.put(result); // Don't know if this is the correct way to do it... as for now I have it like that
+            BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
+            resultFetcher.put(result);
         }
     }
 
@@ -182,7 +188,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 		}
 	}
 
-	@Override
+    @Override
 	public void run() {
 			try {
 				//So far this doesn't solve normal task. Only tasks that are marked as simple

@@ -35,6 +35,16 @@ public class SpaceProxy implements Space, Runnable {
     }
 
     @Override
+    public void publishTask(Task task) throws RemoteException, InterruptedException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Result takeResult(String id) throws RemoteException, InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void putResult(Result result) throws RemoteException, InterruptedException {
         space.putResult(result);
     }
@@ -80,11 +90,6 @@ public class SpaceProxy implements Space, Runnable {
 
     @Override
     public void put(Task task) throws RuntimeException, RemoteException, InterruptedException {
-        throw new IllegalAccessError("Not implemented");
-    }
-
-    @Override
-    public Result take() throws RemoteException, InterruptedException {
         throw new IllegalAccessError("Not implemented");
     }
 
