@@ -7,10 +7,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider {
@@ -42,11 +42,11 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     }
 
     private List<Space> spaces;
-    private Map<String, BlockingQueue<Result>> resultQs;
+    private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
     protected SpaceProviderImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
-        resultQs = new HashMap<String, BlockingQueue<Result>>();
+        resultQs = new ConcurrentHashMap<String, BlockingQueue<Result>>();
     }
 
     @Override

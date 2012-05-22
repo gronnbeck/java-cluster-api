@@ -8,6 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.*;
@@ -18,7 +19,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 	private BlockingQueue<Result<?>> resultQue;
 	private BlockingQueue<Task<?>> taskQue;
 	private BlockingQueue<Task<?>> simpleTaskQue;
-    private HashMap<Object,ContinuationTask> mapContin;
+    private ConcurrentHashMap<Object,ContinuationTask> mapContin;
     private ArrayList<Computer> computers;
     private HashMap<String, BlockingQueue<Result>> resultQs;
     private Shared<?> shared;
@@ -29,7 +30,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
         resultQue = new LinkedBlockingQueue<Result<?>>();
-        mapContin = new HashMap<Object, ContinuationTask>();
+        mapContin = new ConcurrentHashMap<Object, ContinuationTask>();
 
         resultQs = new HashMap<String, BlockingQueue<Result>>();
         
