@@ -44,10 +44,18 @@ public interface Task<T> extends Serializable {
     
     boolean isSimple();
     
+    
     /**
      * 
-     * @param b 
-     * @return
+     * @return The tasks priority
      */
-
+    int getPriority();
+    
+    
+    /**
+     * Set the tasks priority
+     * @param priority
+     */
+    void setPriority(int priority);
+    
 }

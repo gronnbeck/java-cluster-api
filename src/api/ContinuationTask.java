@@ -11,7 +11,7 @@ public interface ContinuationTask extends Task {
 
     /**
      * Used to control if the task is ready to execute
-     * @return true of all the subtasks has been executed, false if not
+     * @return true if all the subtasks has been executed, false if not
      */
     boolean isReady();
 

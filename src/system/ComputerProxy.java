@@ -11,6 +11,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private Computer computer;
     protected Space space;
     private Task cached;
+    
 
     /**
      * Creates a Proxy for handling Computers
@@ -22,12 +23,14 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
+        
+        // TODO: Start thread from outside constructor
         Thread t = new Thread(this);
         t.start();
     }
 
     @Override
-    public Result execute(Task task) throws RemoteException {
+    public Result<?> execute(Task<?> task) throws RemoteException {
         return computer.execute(task);
     }
 
@@ -42,9 +45,16 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 	}
 
 	@Override
-	public void setShared(Shared shared) throws RemoteException {
-		computer.setShared(shared);
-		
+	public void setShared(Shared<?> shared) throws RemoteException {
+		try {
+			computer.setShared(shared);
+		} catch (RemoteException e) {
+			space.deregister(computer);
+			/**
+			 * Computer proxy does not shut down until it tries passing a task to the dead computer
+			 * This is ineffective and not very elegant, but we could not found a suitable way to handle it.
+			 */
+		}
 	}
 
     @Override
@@ -53,28 +63,22 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
     @Override
-    public Result executeCachedTask() throws RemoteException {
+    public Result<?> executeCachedTask() throws RemoteException {
         return computer.executeCachedTask();
     }
 
 
-    private void handleFaultyComputer(Task task)  {
+    private void handleFaultyComputer(Task<?> task)  {
         try {
             space.put(task);
-            deregisterComputer();
+            space.deregister(this);
         } catch (RemoteException ignore) { }
           catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void deregisterComputer() {
-        try {
-            space.deregister(this);
-        } catch (RemoteException ignore) { }
-    }
-
-    private void putResultToSpace(Result result) {
+    private void putResultToSpace(Result<?> result) {
         try {
             space.putResult(result);
         }
@@ -84,7 +88,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-    private void lookForCachedResult(Result result) {
+    private void lookForCachedResult(Result<?> result) {
         if (result instanceof ContinuationResult) {
             // One should not be able to access the ContinuationTask in this way. Its error-prone.
             // TODO find a better way to retrieve tasks marked as cached
@@ -106,6 +110,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
      * task back into the space, and deregisters it self.
      */
     public void run() {
+    	
         // TODO Clean!
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
@@ -126,29 +131,28 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     return;
                 }
                 if (hasCached && cached != null) {
-                        try {
-                            result = computer.executeCachedTask();
-                            if (result == null) continue;   // the cached task has already been executed. This should never happen since
-                                                            // Computer should be single threaded (Intended design)
-                        } catch (RemoteException e) {
-                            System.out.println("A computer has crashed. Putting the cached task back to space");
-                            handleFaultyComputer(cached);
-                            return;
-                        }
-                        cached = null;
-                    }
+	                    try {
+	                        result = computer.executeCachedTask();
+	                        if (result == null) continue;   // the cached task has already been executed. This should never happen since
+	                                                        // Computer should be single threaded (Intended design)
+	                    } catch (RemoteException e) {
+	                        System.out.println("A computer has crashed. Putting the cached task back to space");
+	                        handleFaultyComputer(cached);
+	                        return;
+	                    }
+	                    cached = null;
+	                }
                 else {
                     Task task = space.takeTask();
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
-                            System.out.println("A computer has crashed. Putting the currently running task back to space");
-                            handleFaultyComputer(task);
-                            return;          // exit thread . The proxy is no longer needed
+                    	System.out.println("A computer has crashed. Putting the currently running task back to space");
+                        handleFaultyComputer(task);
+                        return;          // exit thread . The proxy is no longer needed
                     }
                 }
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
             } catch (RemoteException ignore) {}
 

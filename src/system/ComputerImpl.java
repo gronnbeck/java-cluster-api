@@ -7,18 +7,25 @@ import api.*;
 
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
-    private Space space;
+	private static final long serialVersionUID = -2427051113306414537L;
+	private Space space;
     private Shared<?> shared;
-    private Task cached;
+    private Task<?> cached;
+//    private Runtime runtime;
     
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
+//        this.runtime = Runtime.getRuntime();
+//        this.runtime.addShutdownHook(new ShutdownProcedure(this));
+
 	}
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
-        task.setComputer(this);
+//		System.out.println("Executing task: " + task.getTaskIdentifier());
+        
+		task.setComputer(this);
         return task.execute();
 	}
 
@@ -28,11 +35,11 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
     @Override
-    public  Result executeCachedTask() throws RemoteException {
+    public  Result<?> executeCachedTask() throws RemoteException {
         System.out.println("Running a cached task");
         // hate too return _null_. Fix later
         if (cached == null) return null;
-        Task task = cached;
+        Task<?> task = cached;
         cached = null;
         return execute(task);
     }
@@ -54,7 +61,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             if (args.length == 2) {
                 port = Integer.parseInt(args[1]);
             }
-
+            
 
 			String urlString = "rmi://"+url+":"+port+"/"+Space.SERVICE_NAME;
 			System.out.println("Connecting to " + url + ":" + port + ". ");
@@ -82,7 +89,10 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             }
 
 			System.out.println("Computer successfully registered!");
-		} catch (Exception e) {
+		}catch (RemoteException e) {
+			System.out.println("Could not connect to space. Is the space running?");
+		} 
+		catch (Exception e) {
 			System.out.println("Something went wrong!");
 			e.printStackTrace();
 		}
@@ -104,7 +114,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
 	@Override
-	public  void setShared(Shared proposedShared) throws RemoteException {
+	public  void setShared(Shared<?> proposedShared) throws RemoteException {
 		if (checkAndSetSharedThreadSafe(proposedShared))	{
 		    space.setShared( shared );
 		}
