@@ -1,5 +1,6 @@
 package system;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -149,20 +150,33 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     
 
     public static void main(String[] args) {
-        int port = 8888;
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
         try {
             Space space = new SpaceImpl();
 
+            // Setup registery for Computers to find a Space
             Registry reg = LocateRegistry.createRegistry(port);
             reg.rebind(SERVICE_NAME, space);
             System.out.println("Space running!");
 
+            // Connect to SpaceProvider
+            Registry spaceProviderRegistry = LocateRegistry.getRegistry(host, 8887);
+            SpaceProvider spaceProvider = (SpaceProvider) spaceProviderRegistry.lookup(SpaceProvider.SERVICE_NAME);
+            spaceProvider.registerSpace(space);
+            System.out.println("Space connected to SpaceProvider at " + host);
+
+
+
+
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
