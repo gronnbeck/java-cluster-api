@@ -56,7 +56,8 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
             String taskId = continuationTask.getTaskIdentifier();
-            resultQs.put(taskId, new LinkedBlockingQueue<Result>());
+            BlockingQueue<Result> resultQ = new LinkedBlockingQueue<Result>();
+            resultQs.put(taskId, resultQ);
             int counter = 0;
             System.out.println("Breaking up task into subtasks");
             for (Task currentTask : continuationTask.getTasks()) {
@@ -66,7 +67,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
             }
             System.out.println("Waiting for results");
             for (int i = 0; i < continuationTask.getTasks().size(); i++) {
-                Result subResult = resultQs.get(taskId).take();
+                Result subResult = resultQ.take();
                 continuationTask.ready(subResult);
                 System.out.println(i+1+"/"+continuationTask.getTasks().size()+" results received.");
             }
