@@ -7,7 +7,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,20 +17,20 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
 
     private class TaskPublisher extends Thread {
 
-        SpaceProvider spaceProvider;
+        String id;
         Task task;
         Space space;
-        public TaskPublisher(SpaceProvider spaceProvider, Task task, Space space){
-            this.spaceProvider = spaceProvider;
+        public TaskPublisher(String id, Task task, Space space){
             this.task = task;
             this.space = space;
+            this.id = id;
         }
 
         @Override
         public void run() {
             try {
                 Result result = space.publishTask(task);
-                resultQ.put(result);
+                resultQs.get(id).put(result);
             } catch (RemoteException e) {
                 System.out.println("Have assumed that a Space will never shutdown unexpectedly. Exiting.");
                 System.exit(0);
@@ -40,11 +42,11 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     }
 
     private List<Space> spaces;
-    private BlockingQueue<Result> resultQ;
+    private Map<String, BlockingQueue<Result>> resultQs;
     protected SpaceProviderImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
-        resultQ = new LinkedBlockingQueue<Result>();
+        resultQs = new HashMap<String, BlockingQueue<Result>>();
     }
 
     @Override
@@ -53,16 +55,18 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         Result result = task.execute();
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
+            String taskId = continuationTask.getTaskIdentifier();
+            resultQs.put(taskId, new LinkedBlockingQueue<Result>());
             int counter = 0;
             System.out.println("Breaking up task into subtasks");
             for (Task currentTask : continuationTask.getTasks()) {
-                TaskPublisher taskPublisher = new TaskPublisher(this, currentTask, spaces.get(counter));
+                TaskPublisher taskPublisher = new TaskPublisher(taskId, currentTask, spaces.get(counter));
                 taskPublisher.start();
                 counter = (counter + 1) % spaces.size();
             }
             System.out.println("Waiting for results");
             for (int i = 0; i < continuationTask.getTasks().size(); i++) {
-                Result subResult = resultQ.take();
+                Result subResult = resultQs.get(taskId).take();
                 continuationTask.ready(subResult);
                 System.out.println(i+1+"/"+continuationTask.getTasks().size()+" results received.");
             }
