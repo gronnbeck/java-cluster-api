@@ -46,15 +46,13 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-    public void publishTask(Task task) throws RemoteException, InterruptedException {
+    public Result publishTask(Task task) throws RemoteException, InterruptedException {
         resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
         put(task);
+        return resultQs.get(task.getTaskIdentifier()).take();
     }
 
-    @Override
-    public Result takeResult(String id) throws RemoteException, InterruptedException {
-        return resultQs.get(id).take();
-    }
+
 
     @Override
     public Task<?> takeTask() throws RemoteException, InterruptedException {

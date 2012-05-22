@@ -29,25 +29,15 @@ public interface Space extends Remote, Computer2Space, Task2Space {
     
     void setShared(Shared<?> shared) throws RemoteException;
 
+
     /**
      * This method should be invoked when a clients wants to publish a task to Space.
      * @param task The task that should be published
+     * @return  Returns the result of a task. Uses the task identification string to find the correct result queue to fetch results from.
      * @throws java.rmi.RemoteException
      * @throws java.lang.InterruptedException
      */
-
-    void publishTask(Task task) throws RemoteException, InterruptedException;
-
-    /**
-     * Returns the result of a task. Uses the task identification string to find the correct
-     * result queue to fetch results from.
-     * @param id A task identification string
-     * @throws java.rmi.RemoteException
-     * @throws java.lang.InterruptedException
-     */
-    Result takeResult(String id) throws RemoteException, InterruptedException;
-
-
+    Result publishTask(Task task) throws RemoteException, InterruptedException;
 
 
 }

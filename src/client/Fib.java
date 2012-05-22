@@ -19,8 +19,7 @@ public class Fib {
         FibTask fibTask = new FibTask(NTH_NUMBER);
 
         long clientRunTime = System.nanoTime();
-        space.publishTask(fibTask);
-        Result result = space.takeResult(fibTask.getTaskIdentifier());
+        Result result = space.publishTask(fibTask);
         System.out.println(NTH_NUMBER + "th number of fib: " + result.getTaskReturnValue());
         System.out.println("Runtime: " + result.getTaskRunTime());
         System.out.println("Client time: " + (System.nanoTime() - clientRunTime));

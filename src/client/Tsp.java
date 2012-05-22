@@ -85,9 +85,7 @@ public class Tsp {
         System.out.println("Upperbound: " + upperBound);
         TspTask tspTask = new TspTask(coord);
         long runTime = System.currentTimeMillis();
-        space.publishTask(tspTask);
-        System.out.println("Task in space. Waiting for result");
-        TspResult result = (TspResult)space.takeResult(tspTask.getTaskIdentifier());
+        TspResult result =  (TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);
