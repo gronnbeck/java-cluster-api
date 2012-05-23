@@ -30,13 +30,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
         resultQue = new LinkedBlockingQueue<Result<?>>();
-<<<<<<< HEAD
         mapContin = new ConcurrentHashMap<Object, ContinuationTask>();
 
         resultQs = new HashMap<String, BlockingQueue<Result>>();
-=======
-        mapContin = new HashMap<Object, ContinuationTask>();
->>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
         
         Thread computerThread = new Thread(this);
         computerThread.start();
@@ -57,6 +53,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         put(task);
         return resultQs.get(task.getTaskIdentifier()).take();
     }
+
+
 
     @Override
     public Task<?> takeTask() throws RemoteException, InterruptedException {
@@ -122,7 +120,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         // if not it is probably the end result (as I see it now)
         // in the case of fib. It should just be 1 number left
         else {
-            resultQue.put(result); // Don't know if this is the correct way to do it... as for now I have it like that
+            BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
+            resultFetcher.put(result);
         }
     }
 
@@ -148,6 +147,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
             }
         }
     }
+    
+    
 
     public static void main(String[] args) {
         String host = args[0];
@@ -180,24 +181,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         }
     }
 
-    public static void main(String[] args) {
-        int port = 8888;
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new java.rmi.RMISecurityManager());
-        }
-        try {
-            Space space = new SpaceImpl();
-
-            Registry reg = LocateRegistry.createRegistry(port);
-            reg.rebind(SERVICE_NAME, space);
-            System.out.println("Space running!");
-
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
         if (shared.isNewerThan(this.shared)) {
             this.shared = shared;
@@ -218,7 +201,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 		}
 	}
 
-	@Override
+    @Override
 	public void run() {
 			try {
 				//So far this doesn't solve normal task. Only tasks that are marked as simple
@@ -234,8 +217,5 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 			
 
 		
-<<<<<<< HEAD
-=======
 	}
->>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
 }

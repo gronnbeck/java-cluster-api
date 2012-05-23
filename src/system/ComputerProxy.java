@@ -58,14 +58,20 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    private void handleFaultyComputer(Task task)  {
+    private void giveTaskBack2Space(Task task) {
         try {
             space.put(task);
-            deregisterComputer();
-        } catch (RemoteException ignore) { }
-          catch (InterruptedException e) {
+        } catch (RemoteException ignore) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void handleFaultyComputer(Task task)  {
+        // TODO add the process of handling prefetched tasks as well
+       giveTaskBack2Space(task);
+       deregisterComputer();
     }
 
     private void deregisterComputer() {
@@ -119,9 +125,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     hasCached = hasCached();     // we may not need this to be asynchronous.
                 } catch (RemoteException e) {
                     System.out.println("A computer crashed on checking if it had a cached task");
-                    if (cached != null) {
-                        handleFaultyComputer(cached);
-                    }
+                    if (cached != null) { handleFaultyComputer(cached); }
                     cached = null;
                     return;
                 }
@@ -142,9 +146,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
-                            System.out.println("A computer has crashed. Putting the currently running task back to space");
-                            handleFaultyComputer(task);
-                            return;          // exit thread . The proxy is no longer needed
+                        System.out.println("A computer has crashed. Putting the currently running task back to space");
+                        if (cached != null) giveTaskBack2Space(cached);
+                        handleFaultyComputer(task);
+                        return;          // exit thread . The proxy is no longer needed
                     }
                 }
             }

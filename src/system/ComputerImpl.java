@@ -1,6 +1,5 @@
 package system;
 
-import java.io.Serializable;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -22,7 +21,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
         task.setComputer(this);
-<<<<<<< HEAD
         Result result = task.execute();
         // TODO This part can be more elegant
         if (result instanceof ContinuationResult) {
@@ -32,9 +30,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             cached.setCached(true);
         }
         return result;
-=======
-        return task.execute();
->>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
 	}
 
     @Override
