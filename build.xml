@@ -44,6 +44,17 @@
   	</java>
 	</target>
 
+    <target name="runComputer8889" description="run computer" >
+        <java classname="system.ComputerImpl" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <arg value="8889"/>
+            <classpath>
+                <pathelement location="dist/computer.jar"/>
+            </classpath>
+        </java>
+    </target>
+
     <target name="runComputerP" description="run computer" >
         <java classname="system.ComputerImpl" fork="true">
             <jvmarg value="-Djava.security.policy=policy"/>
@@ -85,14 +96,28 @@
 	<target name="runSpace" description="run space" >
 		<java classname="system.SpaceImpl" fork="true">
 			<jvmarg value="-Djava.security.policy=policy"/>
-            <jvmarg value="-Xmx1000m"/>
+            <arg value="localhost"/>
+            <arg value="8888"/>
+           <!--  <jvmarg value="-Xmx1000m"/> -->
 			<classpath>
 				<pathelement location="dist/space.jar"/>
 			</classpath>
 		</java>
-	</target>  
+	</target>
 
-	<target name="runTspClient" description="run client" >
+    <target name="runSpace8889" description="run space" >
+        <java classname="system.SpaceImpl" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <arg value="8889"/>
+            <!--  <jvmarg value="-Xmx1000m"/> -->
+            <classpath>
+                <pathelement location="dist/space.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runTspClient" description="run client" >
 	        <java classname="client.Tsp" fork="true">
 	            <jvmarg value="-Djava.security.policy=policy"/>
 	            <arg value="localhost"/>
@@ -114,6 +139,16 @@
 
     <target name="runFibClient" description="run client" >
         <java classname="client.Fib" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <classpath>
+                <pathelement location="dist/client.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runSpaceProvider" description="run client" >
+        <java classname="system.SpaceProviderImpl" fork="true">
             <jvmarg value="-Djava.security.policy=policy"/>
             <arg value="localhost"/>
             <classpath>

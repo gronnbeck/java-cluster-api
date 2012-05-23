@@ -1,15 +1,15 @@
 package system;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import api.*;
 
@@ -19,29 +19,32 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 	private BlockingQueue<Result<?>> resultQue;
 	private BlockingQueue<Task<?>> taskQue;
 	private BlockingQueue<Task<?>> simpleTaskQue;
-    private HashMap<Object,ContinuationTask> mapContin;
+    private ConcurrentHashMap<Object,ContinuationTask> mapContin;
     private ArrayList<Computer> computers;
+    private HashMap<String, BlockingQueue<Result>> resultQs;
     private Shared<?> shared;
-//    private Runtime runtime;
 
     public SpaceImpl() throws RemoteException {
         super();
         computers = new ArrayList<Computer>();
-        taskQue = new PriorityBlockingQueue<Task<?>>(11, new TaskComparator());
+        taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
         resultQue = new LinkedBlockingQueue<Result<?>>();
-        mapContin = new HashMap<Object, ContinuationTask>();
+<<<<<<< HEAD
+        mapContin = new ConcurrentHashMap<Object, ContinuationTask>();
 
+        resultQs = new HashMap<String, BlockingQueue<Result>>();
+=======
+        mapContin = new HashMap<Object, ContinuationTask>();
+>>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
         
-//		TODO: Make the shutdown hooks work to shutdown gracefully
-//        runtime = Runtime.getRuntime();
-//        runtime.addShutdownHook(new ShutdownProcedure(this));
-        this.run();
+        Thread computerThread = new Thread(this);
+        computerThread.start();
     }
 
     @Override
     public void put(Task<?> task) throws RuntimeException, RemoteException, InterruptedException {
-        if (task.isSimple()) {	
+        if (task.isSimple()) {
 			simpleTaskQue.put(task);
 			return;
 		}
@@ -49,8 +52,10 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-    public Result<?> take() throws RemoteException, InterruptedException {
-        return resultQue.take();
+    public Result publishTask(Task task) throws RemoteException, InterruptedException {
+        resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
+        put(task);
+        return resultQs.get(task.getTaskIdentifier()).take();
     }
 
     @Override
@@ -66,13 +71,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     
     @Override
     public synchronized void stop() throws RemoteException {
-    	
-    	System.out.println("Stop() invoked on the space..");
-    	
         for (Computer computer : computers) {
             computer.stop();
         }
-        System.exit(0);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
     	if(this.shared != null) computer.setShared(this.shared);
     	computers.add(computer);
-    	System.out.println("The space computer is successfully registered!");
+    	System.out.println("The space computer is successfully registred!");
     	
     }
 
@@ -96,7 +97,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     @Override
-    public synchronized void putResult(Result<?> result) throws RemoteException, InterruptedException {
+    public synchronized void putResult(Result result) throws RemoteException, InterruptedException {
     	if (result == null) return;
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
@@ -128,7 +129,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     @Override
     public synchronized void registerContin(ContinuationTask continuation) throws RemoteException {
 
-        for (Task<?> task : continuation.getTasks()) {
+        for (Task task : continuation.getTasks()) {
             try {
                 // Ignore cached tasks.
             	if (!task.getCached()) {
@@ -147,8 +148,55 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
             }
         }
     }
-    
-    
+
+    public static void main(String[] args) {
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new java.rmi.RMISecurityManager());
+        }
+        try {
+            Space space = new SpaceImpl();
+
+            // Setup registery for Computers to find a Space
+            Registry reg = LocateRegistry.createRegistry(port);
+            reg.rebind(SERVICE_NAME, space);
+            System.out.println("Space running!");
+
+            // Connect to SpaceProvider
+            Registry spaceProviderRegistry = LocateRegistry.getRegistry(host, 8887);
+            SpaceProvider spaceProvider = (SpaceProvider) spaceProviderRegistry.lookup(SpaceProvider.SERVICE_NAME);
+            spaceProvider.registerSpace(space);
+            System.out.println("Space connected to SpaceProvider at " + host);
+
+
+
+
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public static void main(String[] args) {
+        int port = 8888;
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new java.rmi.RMISecurityManager());
+        }
+        try {
+            Space space = new SpaceImpl();
+
+            Registry reg = LocateRegistry.createRegistry(port);
+            reg.rebind(SERVICE_NAME, space);
+            System.out.println("Space running!");
+
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
         if (shared.isNewerThan(this.shared)) {
@@ -172,43 +220,22 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 
 	@Override
 	public void run() {
-		try {
-			//So far this doesn't solve normal task. Only tasks that are marked as simple
-			//TODO: Add support for normal tasks as well!
-			//Currently all continuation tasks are set to simple.. So all the contination tasks will be executed in space!
+			try {
+				//So far this doesn't solve normal task. Only tasks that are marked as simple
+				//TODO: Add support for normal tasks as well!
+				//Currently all continuation tasks are set to simple.. So all the contination tasks will be executed in space!
+				Computer comp = new ComputerImpl(this);
+				SpaceComputer spaceComputer = new SpaceComputer(comp,this);
+				this.registerSpaceComputer(spaceComputer);
+				
+			} catch (RemoteException ignore) {
+				//Cannot happen!
+			}
 			
-			Computer comp = new ComputerImpl(this);
-			SpaceComputer spaceComputer = new SpaceComputer(comp,this);
-			this.registerSpaceComputer(spaceComputer);
-			
-		} catch (RemoteException ignore) { } //Cannot happen!
-	}
 
-	public static void main(String[] args) {
-	    int port = 8888;
-	    if (System.getSecurityManager() == null) {
-	        System.setSecurityManager(new java.rmi.RMISecurityManager());
-	    }
-	    
-	    try {
-	        Registry reg = LocateRegistry.createRegistry(port);
-
-	        Space space = new SpaceImpl();
-	        reg.rebind(SERVICE_NAME, space);
-	
-	    }catch (ExportException e) {
-	        System.err.println(e.getMessage());
-	        System.exit(0);
-	    } 
-	    
-	    catch (RemoteException e) {
-	        e.printStackTrace();
-	    }
-	    catch (Exception e) {
-	    	e.printStackTrace();
-	    }
+		
+<<<<<<< HEAD
+=======
 	}
-	
-	
-	
+>>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
 }

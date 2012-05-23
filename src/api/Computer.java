@@ -36,7 +36,7 @@ public interface Computer extends Remote, Serializable {
 
     boolean hasCached() throws RemoteException;
 
-    Result<?> executeCachedTask() throws RemoteException;
+    Result executeCachedTask() throws RemoteException;
 
     // Dont know if we need this anymore?
     Space getSpace() throws RemoteException;

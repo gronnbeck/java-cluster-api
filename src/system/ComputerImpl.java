@@ -1,32 +1,40 @@
 package system;
 
+import java.io.Serializable;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+
 import api.*;
 
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
-	private static final long serialVersionUID = -2427051113306414537L;
-	private Space space;
+    private Space space;
     private Shared<?> shared;
-    private Task<?> cached;
-//    private Runtime runtime;
+    private Task cached;
     
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
-//        this.runtime = Runtime.getRuntime();
-//        this.runtime.addShutdownHook(new ShutdownProcedure(this));
-
 	}
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
-//		System.out.println("Executing task: " + task.getTaskIdentifier());
-        
-		task.setComputer(this);
+        task.setComputer(this);
+<<<<<<< HEAD
+        Result result = task.execute();
+        // TODO This part can be more elegant
+        if (result instanceof ContinuationResult) {
+            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
+            ArrayList<Task> tasks = continuationTask.getTasks();
+            cached = tasks.get(0);
+            cached.setCached(true);
+        }
+        return result;
+=======
         return task.execute();
+>>>>>>> parent of 006d7c6... Improved fault tolerance. Added support for task priorities
 	}
 
     @Override
@@ -35,11 +43,11 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
     @Override
-    public  Result<?> executeCachedTask() throws RemoteException {
+    public  Result executeCachedTask() throws RemoteException {
         System.out.println("Running a cached task");
         // hate too return _null_. Fix later
         if (cached == null) return null;
-        Task<?> task = cached;
+        Task task = cached;
         cached = null;
         return execute(task);
     }
@@ -61,7 +69,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             if (args.length == 2) {
                 port = Integer.parseInt(args[1]);
             }
-            
+
 
 			String urlString = "rmi://"+url+":"+port+"/"+Space.SERVICE_NAME;
 			System.out.println("Connecting to " + url + ":" + port + ". ");
@@ -89,10 +97,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             }
 
 			System.out.println("Computer successfully registered!");
-		}catch (RemoteException e) {
-			System.out.println("Could not connect to space. Is the space running?");
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println("Something went wrong!");
 			e.printStackTrace();
 		}
@@ -114,7 +119,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
 	@Override
-	public  void setShared(Shared<?> proposedShared) throws RemoteException {
+	public  void setShared(Shared proposedShared) throws RemoteException {
 		if (checkAndSetSharedThreadSafe(proposedShared))	{
 		    space.setShared( shared );
 		}

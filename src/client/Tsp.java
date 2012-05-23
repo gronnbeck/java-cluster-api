@@ -1,5 +1,6 @@
 package client;
 
+import api.Result;
 import api.Space;
 import tasks.DoubleShared;
 import tasks.Pair;
@@ -84,9 +85,7 @@ public class Tsp {
         System.out.println("Upperbound: " + upperBound);
         TspTask tspTask = new TspTask(coord);
         long runTime = System.currentTimeMillis();
-        space.put(tspTask);
-        System.out.println("Task in space. Waiting for result");
-        TspResult result = (TspResult)space.take();
+        TspResult result =  (TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

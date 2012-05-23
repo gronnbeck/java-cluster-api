@@ -18,6 +18,6 @@ public interface Task2Space extends Remote {
      * @throws java.rmi.RemoteException
      * @throws InterruptedException
      */
-    void putResult(Result<?> result) throws RemoteException, InterruptedException;
+    void putResult(Result result) throws RemoteException, InterruptedException;
 
 }

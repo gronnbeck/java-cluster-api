@@ -12,6 +12,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+
+import api.Result;
 import tasks.*;
 import api.Space;
 
@@ -64,8 +66,7 @@ public class Mandelbrot {
 		 
 		 MandelTask MandelTask = new MandelTask(id,lowerX,lowerY,edge,n,iteration_limit);
 		 long jobExecTime = System.nanoTime();
-		 space.put(MandelTask);
-		 MandelResult res = (MandelResult)space.take();
+		 Result res = space.publishTask(MandelTask);
 		 jobExecTime = System.nanoTime() - jobExecTime;
 		 count = (int[][])res.getTaskReturnValue();
 		 //End time - CLIENT
