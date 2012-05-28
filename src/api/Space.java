@@ -2,6 +2,7 @@ package api;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 public interface Space extends Remote, Computer2Space, Task2Space {
     public static String SERVICE_NAME = "Space";
@@ -39,5 +40,7 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      */
     Result publishTask(Task task) throws RemoteException, InterruptedException;
 
+    
+    HashMap getInfo() throws RemoteException;
 
 }

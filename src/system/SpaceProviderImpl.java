@@ -43,10 +43,15 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
 
     private List<Space> spaces;
     private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
+    private long startTime;
+    
+    
     protected SpaceProviderImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
         resultQs = new ConcurrentHashMap<String, BlockingQueue<Result>>();
+        
+        startTime = System.nanoTime();
     }
 
     @Override
@@ -90,7 +95,23 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         spaces.remove(space);
     }
 
-    public static void main(String[] args) {
+    @Override
+	public String getInfo() throws RemoteException {
+    	String info = " ";
+    	info += "\rUptime: " + Math.round(((System.nanoTime() - startTime)) / 10E8) + "seconds\n";
+    	info += "\rNumber of spaces: " + Math.random();
+    	
+    	for (Space space : spaces) {
+    		space.getInfo();
+		}
+    	
+    	info += "\rNumber of Computers: \n";
+    	
+    	
+		return info;
+	}
+
+	public static void main(String[] args) {
         int port = 8887;
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());

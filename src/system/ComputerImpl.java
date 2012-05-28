@@ -20,8 +20,14 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
+		
+		long taskStartTime = System.nanoTime();
+		
         task.setComputer(this);
         Result result = task.execute();
+        
+        result.setTaskRunTime(taskStartTime);
+        
         // TODO This part can be more elegant
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
@@ -39,7 +45,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     @Override
     public  Result executeCachedTask() throws RemoteException {
-        System.out.println("Running a cached task");
+//        System.out.println("Running a cached task");
         // hate too return _null_. Fix later
         if (cached == null) return null;
         Task task = cached;

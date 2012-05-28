@@ -29,6 +29,14 @@ public interface SpaceProvider extends Remote {
      * @throws RemoteException
      */
     public void deregisterSpace(Space space) throws RemoteException;
+    
+    
+    /**
+     * Show feedback to the user about the work being done
+     * @return A string containing 
+     * @throws RemoteException
+     */
+    public String getInfo() throws RemoteException;
 
 
 }

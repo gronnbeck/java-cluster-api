@@ -1,7 +1,6 @@
 package system;
 
 import api.*;
-
 import java.rmi.RemoteException;
 import java.util.UUID;
 

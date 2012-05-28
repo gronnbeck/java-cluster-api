@@ -1,20 +1,17 @@
 package tasks;
 
-import api.Result;
-
 import java.util.ArrayList;
+import system.ResultImpl;
 
-public class TspResult implements Result {
+public class TspResult extends ResultImpl {
 
-    private long runTime;
     private double cost;
-    private String id;
     private ArrayList<Integer> path;
 
     public TspResult(ArrayList<Integer> path, double cost, String id) {
+    	super(id);
         this.path = path;
         this.cost = cost;
-        this.id = id;
     }
 
     /**
@@ -25,20 +22,4 @@ public class TspResult implements Result {
         return new Pair<Double, ArrayList<Integer>>(cost, path);
     }
 
-    /**
-     * @param elapsed_time set how much time that elapsed for a task to complete the TSP task (in ns)
-     */
-    public void setTaskRunTime(long elapsed_time) {
-        runTime = elapsed_time;
-    }
-
-    @Override
-    public long getTaskRunTime() {
-        return runTime;
-    }
-
-    @Override
-    public String getTaskIdentifier() {
-        return id;
-    }
 }

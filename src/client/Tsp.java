@@ -79,7 +79,8 @@ public class Tsp {
 //                {6,3},
 //                {6,4},
                 };
-
+        
+        
         Double upperBound = findUpperBound(coord);
         space.setShared(new DoubleShared(upperBound+0.5));
         System.out.println("Upperbound: " + upperBound);

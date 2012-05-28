@@ -23,6 +23,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     private ArrayList<Computer> computers;
     private HashMap<String, BlockingQueue<Result>> resultQs;
     private Shared<?> shared;
+    
 
     public SpaceImpl() throws RemoteException {
         super();
@@ -174,7 +175,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 
 
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -218,4 +218,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 
 		
 	}
+    
+    public HashMap<String, String> getInfo() {
+    	HashMap<String, String> info = new HashMap<String, String>();
+    	
+    	info.put("Computers_running", ((Integer)computers.size()).toString());
+    	
+    	
+    	
+    	return null;
+    }
 }
