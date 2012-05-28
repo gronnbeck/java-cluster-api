@@ -1,24 +1,20 @@
 package tasks;
-
-import java.io.Serializable;
-
 import api.Shared;
+import system.SharedImpl;
 
-public class DoubleShared implements Shared<Double>, Serializable{
-	private Shared shared;
+public class DoubleShared extends SharedImpl<Double> {
     private double val;
 
-
-    public DoubleShared(double val) {
+    public DoubleShared(double val, String jobId) {
+        super(jobId);
         this.val = val;
     }
 
 	@Override
 	public boolean isNewerThan(Shared shared) {
         if (shared == null) return true;
-
-		return val > (Double) shared.getValue();
-	}
+        return val > (Double) shared.getValue();
+    }
 
     @Override
     public Double getValue() {

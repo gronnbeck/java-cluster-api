@@ -4,6 +4,10 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import api.*;
 
@@ -11,11 +15,13 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
     private Shared<?> shared;
+    private ConcurrentHashMap<String, Shared<?>> sharedMap;
     private Task cached;
-    
+
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
+        this.sharedMap = new ConcurrentHashMap<String, Shared<?>>();
 	}
 
 	@Override
@@ -106,23 +112,24 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	}
 
 	@Override
-	public synchronized Object getShared() throws RemoteException {
-		return shared;
+	public synchronized Shared getShared(String id) throws RemoteException {
+        return sharedMap.get(id);
 	}
 
-	
+
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
-        if (shared.isNewerThan(this.shared)) {
-            this.shared = shared;
+        Shared<?> thisShared = sharedMap.get(shared.getJobId());
+        if (shared.isNewerThan(thisShared)) {
+            sharedMap.put(shared.getJobId(), shared);
             return true;
         }
         return false;
     }
 
 	@Override
-	public  void setShared(Shared proposedShared) throws RemoteException {
+	public void setShared(Shared proposedShared) throws RemoteException {
 		if (checkAndSetSharedThreadSafe(proposedShared))	{
-		    space.setShared( shared );
+            space.setShared( proposedShared );
 		}
 		
 	}

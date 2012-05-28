@@ -82,7 +82,7 @@ public class Tsp {
         
         
         Double upperBound = findUpperBound(coord);
-        space.setShared(new DoubleShared(upperBound+0.5));
+        space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
         System.out.println("Upperbound: " + upperBound);
         TspTask tspTask = new TspTask(coord);
         long runTime = System.currentTimeMillis();

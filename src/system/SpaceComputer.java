@@ -7,7 +7,7 @@ import api.Result;
 import api.Space;
 import api.Task;
 
-public class SpaceComputer  extends ComputerProxy implements Runnable{
+public class SpaceComputer extends ComputerProxy implements Runnable{
 	
 	public SpaceComputer(Computer comp, Space space) throws RemoteException {
 		super (comp,space);

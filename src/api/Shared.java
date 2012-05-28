@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 public interface Shared<T> extends Serializable {
 	
 	boolean isNewerThan(Shared<T> shared) throws RemoteException;
-    
+    String getJobId() throws RemoteException;
 	T getValue();
 
 }

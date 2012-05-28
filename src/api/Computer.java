@@ -23,8 +23,7 @@ public interface Computer extends Remote, Serializable {
      * Returns the shared object for this type of task.
      * @return
      */
-
-	Object getShared() throws RemoteException;
+    Shared getShared(String id) throws RemoteException;
 	
 	/**
 	 * Sets the shared object of this computer.
@@ -41,4 +40,5 @@ public interface Computer extends Remote, Serializable {
     // Dont know if we need this anymore?
     Space getSpace() throws RemoteException;
 	void setSpace(Space space) throws RemoteException;
+
 }

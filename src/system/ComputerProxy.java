@@ -19,9 +19,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     // 1. Cache all subtasks (not waiting tasks aka cont's) at Computer
     // 2. Execute tasks, and begin work-stealing
 
-
-
-
     private Computer computer;
     protected Space space;
     private Task cached;
@@ -51,8 +48,8 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 	@Override
-	public Object getShared() throws RemoteException {
-		return computer.getShared();
+	public Shared getShared(String jobId) throws RemoteException {
+		return computer.getShared(jobId);
 	}
 
 	@Override

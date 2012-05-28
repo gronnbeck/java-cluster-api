@@ -9,10 +9,10 @@ hw5.iml
 .classpath
 .project
 .settings/
+*.orig
 
 
 
 /test.py
 /test.pid
 /test/*
-

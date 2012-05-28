@@ -45,11 +45,26 @@ public interface Task<T> extends Serializable {
     boolean isSimple();
 
     /**
-     * Sets the taskIdentifier.
-     * @param identifier
+     * Sets the task id
+     * @param identifier The id represented as a String. The id must be unique.
      */
     void setTaskIdentifier(String identifier);
     
     
+
+    /**
+     * If a client wants to use branch & bound on the system. They need add a jobId reference to the shared object.
+     * The id should be unique, if else, the system may return the wrong shared object.
+     * @return a unique job id as a String
+     */
+    String getJobId();
+
+    /**
+     * advanced:
+     * Sets the job id for this task. This method is used by the framework.
+     * The method is available for developers who needs to modify the jobId for a task. However, it is not recommended to edit it.
+     * @param jobId The job id of a task.
+     */
+    void setJobId(String jobId);
 
 }
