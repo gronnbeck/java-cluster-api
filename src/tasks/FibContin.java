@@ -13,8 +13,8 @@ public class FibContin extends ContinuationTaskImpl {
     private int counter;
     private boolean simple;
 
-    public FibContin(ArrayList<Task> tasks, String id) {
-        super(tasks, id);
+    public FibContin(ArrayList<Task> tasks) {
+        super(tasks);
         counter = tasks.size();
         this.simple = true;
 

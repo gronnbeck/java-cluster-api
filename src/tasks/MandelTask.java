@@ -90,7 +90,7 @@ public class MandelTask extends TaskImpl implements Serializable{
 		tasks.add(sub1);tasks.add(sub2);tasks.add(sub3);tasks.add(sub4);
 
 		
-		return new ContinuationResult( new MandelContin(tasks, id));
+		return createContinutationResult(new MandelContin(tasks));
 	}
 
 	@Override

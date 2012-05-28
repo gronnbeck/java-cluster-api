@@ -1,16 +1,8 @@
 package tasks;
 
-import api.ContinuationTask;
 import api.Result;
 import api.Task;
-import api.Task2Space;
-
-import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.UUID;
-
-import system.ContinuationResult;
 import system.TaskImpl;
 
 public class FibTask extends TaskImpl {
@@ -41,7 +33,7 @@ public class FibTask extends TaskImpl {
         tasks.add(fib1);
         tasks.add(fib2);
         
-        return new ContinuationResult(new FibContin(tasks, getTaskIdentifier()));
+        return createContinutationResult(new FibContin(tasks));
     }
 
 	@Override

@@ -18,8 +18,8 @@ public class TspContin extends ContinuationTaskImpl {
 
   
 
-	public TspContin(int currentCity, ArrayList<Task> tasks, String id) {
-        super(tasks, id);
+	public TspContin(int currentCity, ArrayList<Task> tasks) {
+        super(tasks);
         this.currentCity = currentCity;
         results = new ArrayList<Result>();
         this.tasks = tasks;

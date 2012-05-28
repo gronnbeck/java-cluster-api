@@ -144,7 +144,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         }
 
         // TODO return a special case Result instead where the task will continue
-        return new ContinuationResult(new TspContin(currentCity, subtasks, getTaskIdentifier()));
+        return createContinutationResult(new TspContin(currentCity, subtasks));
 
     }
 
