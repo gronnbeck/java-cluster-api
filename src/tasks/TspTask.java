@@ -95,6 +95,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        System.out.println(shared);
         return shared.getValue();
     }
 
@@ -166,7 +167,7 @@ public class TspTask extends TaskImpl implements Serializable  {
                         output.remove(0);
                     output.add(newElement);
                     currentlyBestCost = cost;
-                    setShared(new DoubleShared(cost));
+                    setShared(new DoubleShared(cost, getJobId()));
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();

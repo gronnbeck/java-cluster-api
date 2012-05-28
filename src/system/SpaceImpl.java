@@ -23,16 +23,17 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     private ArrayList<Computer> computers;
     private HashMap<String, BlockingQueue<Result>> resultQs;
     private Shared<?> shared;
+    private ConcurrentHashMap<String, Shared<?>> sharedMap;
 
     public SpaceImpl() throws RemoteException {
         super();
-        computers = new ArrayList<Computer>();
+        resultQue = new LinkedBlockingQueue<Result<?>>();
         taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
-        resultQue = new LinkedBlockingQueue<Result<?>>();
         mapContin = new ConcurrentHashMap<Object, ContinuationTask>();
-
+        computers = new ArrayList<Computer>();
         resultQs = new HashMap<String, BlockingQueue<Result>>();
+        sharedMap = new ConcurrentHashMap<String, Shared<?>>();
         
         Thread computerThread = new Thread(this);
         computerThread.start();
@@ -53,8 +54,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         put(task);
         return resultQs.get(task.getTaskIdentifier()).take();
     }
-
-
 
     @Override
     public Task<?> takeTask() throws RemoteException, InterruptedException {
@@ -132,7 +131,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
             try {
                 // Ignore cached tasks.
             	if (!task.getCached()) {
-                    /* The caching fails here.... why? */
             		taskQue.put(task);
 				}
 
@@ -182,8 +180,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     }
 
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
-        if (shared.isNewerThan(this.shared)) {
-            this.shared = shared;
+        Shared<?> thisShared = sharedMap.get(shared.getJobId());
+        if (shared.isNewerThan(thisShared)) {
+            sharedMap.put(shared.getJobId(), shared);
             return true;
         }
         return false;
@@ -193,10 +192,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 	public  void setShared(Shared shared) throws RemoteException {
         System.out.println("Trying to update shared");
 		if (checkAndSetSharedThreadSafe(shared)) {
-            System.out.println("Updating shared");
-			this.shared = shared;
 			for (Computer computer : computers) {
-				computer.setShared(shared);
+				    computer.setShared(shared);
 			}
 		}
 	}

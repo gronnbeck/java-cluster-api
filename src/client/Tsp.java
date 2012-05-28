@@ -1,6 +1,4 @@
 package client;
-
-import api.Result;
 import api.Space;
 import tasks.DoubleShared;
 import tasks.Pair;
@@ -80,10 +78,11 @@ public class Tsp {
 //                {6,4},
                 };
 
-        Double upperBound = findUpperBound(coord);
-        space.setShared(new DoubleShared(upperBound+0.5));
-        System.out.println("Upperbound: " + upperBound);
+
         TspTask tspTask = new TspTask(coord);
+        Double upperBound = findUpperBound(coord);
+        space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
+        System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();
         TspResult result =  (TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));

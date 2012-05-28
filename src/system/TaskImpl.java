@@ -19,9 +19,10 @@ public abstract class TaskImpl implements Task {
     }
 
     @Override
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
+    public void setJobId(String jobId) { this.jobId = jobId; }
+
+    @Override
+    public String getJobId() { return jobId; }
 
     @Override
     public String getTaskIdentifier() { return taskId; }
@@ -30,7 +31,8 @@ public abstract class TaskImpl implements Task {
     public void setTaskIdentifier(String id) { this.taskId = id;}
 
 	abstract public Result<?> execute();
- 	public  Object getShared() throws RemoteException { return computer.getShared(); }
+ 	public  Shared getShared() throws RemoteException {
+         System.out.println("debugging"); return computer.getShared(jobId); }
 	protected  void setShared( Shared<?> shared ) throws RemoteException { computer.setShared( shared ); }
 	public  void  setComputer( Computer computer ) { this.computer = computer; }
 	public  void setCached(boolean bol){this.isCached = bol;}
