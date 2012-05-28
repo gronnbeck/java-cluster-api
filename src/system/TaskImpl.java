@@ -7,20 +7,27 @@ import java.util.UUID;
 
 public abstract class TaskImpl implements Task {
 
-    private String id;
+    private String taskId;
+    private String jobId;
 	private Computer computer;
 	private boolean isCached;
 
     public TaskImpl() {
         UUID uuid = UUID.randomUUID();
-        this.id = this.toString() +  uuid.toString();
+        this.jobId = uuid.toString();
+        this.taskId = this.toString() +  uuid.toString();
     }
 
     @Override
-    public String getTaskIdentifier() { return id; }
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
 
     @Override
-    public void setTaskIdentifier(String id) { this.id = id;}
+    public String getTaskIdentifier() { return taskId; }
+
+    @Override
+    public void setTaskIdentifier(String id) { this.taskId = id;}
 
 	abstract public Result<?> execute();
  	public  Object getShared() throws RemoteException { return computer.getShared(); }
@@ -31,6 +38,9 @@ public abstract class TaskImpl implements Task {
 
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
+        for (Task task : continuationTask.getTasks()) {
+            task.setJobId(this.jobId);
+        }
         return new ContinuationResult(continuationTask);
     }
 
