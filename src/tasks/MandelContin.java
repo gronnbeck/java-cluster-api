@@ -14,7 +14,6 @@ public class MandelContin extends ContinuationTaskImpl {
 	
 	private ArrayList<Task> tasks;
 	private ArrayList<Result> results;
-	private String id;
 	private int counter;
 	private int[][] count;
 	private long runTime;
@@ -25,12 +24,10 @@ public class MandelContin extends ContinuationTaskImpl {
      * The task that should be executed after all the subtasks of a MandelBrot Set task
      * has completed.
      * @param tasks the tasks that needs to be completed before this should run
-     * @param id the id of the task that should be continued
      */
-	public MandelContin(ArrayList<Task> tasks,String id){
-        super(tasks,id);
+	public MandelContin(ArrayList<Task> tasks){
+        super(tasks);
 		this.tasks = tasks;
-		this.id = id;
 		this.simple = false;
 		counter = tasks.size();
 		results = new ArrayList<Result>();
@@ -67,14 +64,9 @@ public class MandelContin extends ContinuationTaskImpl {
 				curY++;
 			}
 		}
-		Result res = new MandelResult(count, id);
+		Result res = new MandelResult(count, getTaskIdentifier());
 		res.setTaskRunTime(getTaskRunTime());
 		return res;
-	}
-
-	@Override
-	public String getTaskIdentifier() {
-		return id;
 	}
 
 	@Override

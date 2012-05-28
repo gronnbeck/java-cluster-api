@@ -11,7 +11,7 @@ public class ContinuationResult implements Result<ContinuationTask> {
     private String id;
     private long elapsedTime;
 
-    public ContinuationResult(ContinuationTask task) {
+    protected ContinuationResult(ContinuationTask task) {
         this.task = task;
         this.id = task.getTaskIdentifier();
     }

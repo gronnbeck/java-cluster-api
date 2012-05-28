@@ -43,11 +43,11 @@ public interface Task<T> extends Serializable {
      */
     
     boolean isSimple();
-    
+
     /**
-     * 
-     * @param b 
-     * @return
+     * Sets the taskIdentifier.
+     * @param identifier
      */
+    void setTaskIdentifier(String identifier);
 
 }

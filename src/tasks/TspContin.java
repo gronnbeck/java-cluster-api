@@ -18,8 +18,8 @@ public class TspContin extends ContinuationTaskImpl {
 
   
 
-	public TspContin(int currentCity, ArrayList<Task> tasks, String id) {
-        super(tasks, id);
+	public TspContin(int currentCity, ArrayList<Task> tasks) {
+        super(tasks);
         this.currentCity = currentCity;
         results = new ArrayList<Result>();
         this.tasks = tasks;
@@ -32,8 +32,8 @@ public class TspContin extends ContinuationTaskImpl {
     }
 
     @Override
-    public synchronized ArrayList<Task> getTasks() {
-        return (ArrayList<Task>)tasks.clone();       // this is bad... i think
+    public  ArrayList<Task> getTasks() {
+        return tasks;       // this is bad... i think
     }
 
     @Override

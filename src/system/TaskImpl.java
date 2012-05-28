@@ -18,6 +18,8 @@ public abstract class TaskImpl implements Task {
 
     @Override
     public String getTaskIdentifier() { return id; }
+
+    @Override
     public void setTaskIdentifier(String id) { this.id = id;}
 
 	abstract public Result<?> execute();
@@ -26,5 +28,10 @@ public abstract class TaskImpl implements Task {
 	public  void  setComputer( Computer computer ) { this.computer = computer; }
 	public  void setCached(boolean bol){this.isCached = bol;}
 	public boolean getCached(){return this.isCached;}
+
+    public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
+        continuationTask.setTaskIdentifier(getTaskIdentifier());
+        return new ContinuationResult(continuationTask);
+    }
 
 }
