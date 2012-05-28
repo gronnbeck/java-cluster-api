@@ -29,7 +29,7 @@ public abstract class TaskImpl implements Task {
 	public  void setCached(boolean bol){this.isCached = bol;}
 	public boolean getCached(){return this.isCached;}
 
-    public ContinuationResult createContinutationResult(ContinuationTask continuationTask) {
+    public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
         return new ContinuationResult(continuationTask);
     }

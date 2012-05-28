@@ -3,7 +3,6 @@ package tasks;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import system.ContinuationResult;
 import system.TaskImpl;
 
 import api.Result;
@@ -90,7 +89,7 @@ public class MandelTask extends TaskImpl implements Serializable{
 		tasks.add(sub1);tasks.add(sub2);tasks.add(sub3);tasks.add(sub4);
 
 		
-		return createContinutationResult(new MandelContin(tasks));
+		return createContinuationResult(new MandelContin(tasks));
 	}
 
 	@Override

@@ -5,9 +5,7 @@ import api.*;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.UUID;
 
-import system.ContinuationResult;
 import system.PruneResult;
 import system.TaskImpl;
 
@@ -144,7 +142,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         }
 
         // TODO return a special case Result instead where the task will continue
-        return createContinutationResult(new TspContin(currentCity, subtasks));
+        return createContinuationResult(new TspContin(currentCity, subtasks));
 
     }
 

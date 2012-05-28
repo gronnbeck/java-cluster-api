@@ -33,7 +33,7 @@ public class FibTask extends TaskImpl {
         tasks.add(fib1);
         tasks.add(fib2);
         
-        return createContinutationResult(new FibContin(tasks));
+        return createContinuationResult(new FibContin(tasks));
     }
 
 	@Override

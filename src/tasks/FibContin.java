@@ -21,8 +21,8 @@ public class FibContin extends ContinuationTaskImpl {
     }
 
     @Override
-    public synchronized ArrayList<Task> getTasks() {
-        return (ArrayList<Task>)tasks.clone();
+    public ArrayList<Task> getTasks() {
+        return tasks;
     }
 
     @Override

@@ -32,8 +32,8 @@ public class TspContin extends ContinuationTaskImpl {
     }
 
     @Override
-    public synchronized ArrayList<Task> getTasks() {
-        return (ArrayList<Task>)tasks.clone();       // this is bad... i think
+    public  ArrayList<Task> getTasks() {
+        return tasks;       // this is bad... i think
     }
 
     @Override
