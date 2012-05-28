@@ -81,10 +81,10 @@ public class Tsp {
                 };
         
         
+        TspTask tspTask = new TspTask(coord);
         Double upperBound = findUpperBound(coord);
         space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
         System.out.println("Upperbound: " + upperBound);
-        TspTask tspTask = new TspTask(coord);
         long runTime = System.currentTimeMillis();
         TspResult result =  (TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
