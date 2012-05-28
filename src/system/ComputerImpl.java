@@ -15,13 +15,13 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
     private Shared<?> shared;
-    private SharedMap sharedMap;
+    private ConcurrentHashMap<String, Shared<?>> sharedMap;
     private Task cached;
 
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
         this.space = space;
-        this.sharedMap = new SharedMap(UUID.randomUUID().toString());
+        this.sharedMap = new ConcurrentHashMap<String, Shared<?>>();
 	}
 
 	@Override
@@ -107,18 +107,16 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
 	@Override
 	public synchronized Shared getShared(String id) throws RemoteException {
-        System.out.println("HashMap Id : "+ sharedMap.id);
-        return sharedMap.sharedMap.get(id);
+        return sharedMap.get(id);
 	}
 
 
     private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
-        Shared<?> thisShared = sharedMap.sharedMap.get(shared.getJobId());
+        Shared<?> thisShared = sharedMap.get(shared.getJobId());
         if (shared.isNewerThan(thisShared)) {
-            sharedMap.sharedMap.put(shared.getJobId(), shared);
+            sharedMap.put(shared.getJobId(), shared);
             return true;
         }
-        System.out.println(3);
         return false;
     }
 

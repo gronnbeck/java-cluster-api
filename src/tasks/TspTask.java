@@ -95,7 +95,6 @@ public class TspTask extends TaskImpl implements Serializable  {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        System.out.println(shared);
         return shared.getValue();
     }
 

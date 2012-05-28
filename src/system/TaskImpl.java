@@ -31,8 +31,7 @@ public abstract class TaskImpl implements Task {
     public void setTaskIdentifier(String id) { this.taskId = id;}
 
 	abstract public Result<?> execute();
- 	public  Shared getShared() throws RemoteException {
-         System.out.println("debugging"); return computer.getShared(jobId); }
+ 	public  Shared getShared() throws RemoteException { return computer.getShared(jobId); }
 	protected  void setShared( Shared<?> shared ) throws RemoteException { computer.setShared( shared ); }
 	public  void  setComputer( Computer computer ) { this.computer = computer; }
 	public  void setCached(boolean bol){this.isCached = bol;}
