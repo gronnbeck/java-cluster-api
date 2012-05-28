@@ -8,6 +8,20 @@ import java.util.ArrayList;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
+    // Tasks on Computer   (Concurrent HashMap)
+    // (Stealed) TaskQ     (BlockingQ w/ prio)
+
+    // ComputerProxy2SpaceTaskStealer
+    // run {
+    //    fetches task from Space if available
+    // }
+
+    // 1. Cache all subtasks (not waiting tasks aka cont's) at Computer
+    // 2. Execute tasks, and begin work-stealing
+
+
+
+
     private Computer computer;
     protected Space space;
     private Task cached;
@@ -125,7 +139,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     hasCached = hasCached();     // we may not need this to be asynchronous.
                 } catch (RemoteException e) {
                     System.out.println("A computer crashed on checking if it had a cached task");
-                    if (cached != null) { handleFaultyComputer(cached); }
+                    if (cached != null) {
+                        cached.setCached(false);
+                        handleFaultyComputer(cached);
+                    }
                     cached = null;
                     return;
                 }
@@ -136,6 +153,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                                                             // Computer should be single threaded (Intended design)
                         } catch (RemoteException e) {
                             System.out.println("A computer has crashed. Putting the cached task back to space");
+                            cached.setCached(false);
                             handleFaultyComputer(cached);
                             return;
                         }
@@ -147,7 +165,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         result = execute(task);
                     } catch (RemoteException e) {
                         System.out.println("A computer has crashed. Putting the currently running task back to space");
-                        if (cached != null) giveTaskBack2Space(cached);
+                        if (cached != null) {
+                            cached.setCached(false);
+                            giveTaskBack2Space(cached);
+                        }
                         handleFaultyComputer(task);
                         return;          // exit thread . The proxy is no longer needed
                     }
