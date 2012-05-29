@@ -16,30 +16,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private Task cached;
     private BlockingQueue<Task> taskQ;
 
-    private class TaskFetcher implements Runnable {
-        ComputerProxy computer;
-        private Space space;
-
-        public TaskFetcher(ComputerProxy computer, Space space) {
-            this.computer = computer;
-            this.space = space;
-        }
-
-
-        @Override
-        public void run() {
-            do {
-                try {
-                    Task task = space.takeTask();
-                    computer.taskQ.put(task);
-                } catch (RemoteException ignore) {
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while(true);
-        }
-    }
-
     /**
      * Creates a Proxy for handling Computers
      * @param computer The computer you wish to proxy
@@ -56,8 +32,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         Thread cpThread = new Thread(this);
         cpThread.start();
 
-        Thread tfThread = new Thread(new TaskFetcher(this, space));
-        tfThread.start();
     }
 
     @Override
@@ -156,7 +130,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             try {
                 boolean hasCached;
                 try {
-                    hasCached = hasCached();     // we may not need this to be asynchronous.
+                    hasCached = hasCached();     // TODO we may not need this to be asynchronous.
                 } catch (RemoteException e) {
                     System.out.println("A computer crashed on checking if it had a cached task");
                     if (cached != null) {
@@ -180,8 +154,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         cached = null;
                     }
                 else {
-                    //Task task = space.takeTask();
-                    Task task = taskQ.take();
+                    Task task = space.takeTask();
+                    //System.out.println("Waiting for task. status: [Cached Task: " + (cached != null) + "], [Q.size: " + taskQ.size() + "]");
+                    //Task task = taskQ.take();
+
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
@@ -197,7 +173,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             }
             catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
-            }
+            } catch (RemoteException ignore){}
 
             lookForCachedResult(result);
             putResultToSpace(result);
