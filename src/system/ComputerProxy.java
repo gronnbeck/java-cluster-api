@@ -5,8 +5,8 @@ import api.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.LinkedList;
+import java.util.Stack;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
@@ -14,7 +14,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private Computer computer;
     protected Space space;
     private Task cached;
-    private BlockingQueue<Task> taskQ;
+    private Stack<Task> taskQ;
 
     /**
      * Creates a Proxy for handling Computers
@@ -26,7 +26,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.taskQ = new LinkedBlockingQueue<Task>();
+        this.taskQ = new Stack<Task>();
 
         // Start Computer Proxy threads
         Thread cpThread = new Thread(this);
@@ -57,7 +57,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public boolean hasCached() throws RemoteException {
-        return computer.hasCached();
+        return cached!=null;
     }
 
     @Override
@@ -154,7 +154,13 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         cached = null;
                     }
                 else {
-                    Task task = space.takeTask();
+                    Task task;
+                    if (taskQ.empty()) {
+                        task = space.takeTask();
+                    }
+                    else {
+                        task = taskQ.pop();
+                    }
                     //System.out.println("Waiting for task. status: [Cached Task: " + (cached != null) + "], [Q.size: " + taskQ.size() + "]");
                     //Task task = taskQ.take();
 
@@ -175,9 +181,32 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
             } catch (RemoteException ignore){}
 
+
+
+
             lookForCachedResult(result);
-            putResultToSpace(result);
+            queueTasks(result);
+            try {
+                putResultToSpace(result);
+            } catch(NullPointerException e) {
+                System.out.println("here");
+                e.printStackTrace();
+                return;
+            }
+
+
         } while(true);
+    }
+
+    private void queueTasks(Result result) {
+        if (result instanceof ContinuationResult) {
+            ContinuationResult cr = (ContinuationResult) result;
+            for (Task task : cr.getTaskReturnValue().getTasks()) {
+                if (task.getCached()) continue;
+                task.setCached(true);                             // mark as cached so Space does not Q them
+                taskQ.push(task);
+            }
+        }
     }
 
 

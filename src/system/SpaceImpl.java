@@ -75,9 +75,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
     @Override
     public Task<?> takeTask() throws RemoteException, InterruptedException {
-        Task task =taskQue.take();
-        System.out.println("task given. TaskQ.size: " + taskQue.size());
-        return task;
+        return taskQue.take();
     }
   
     @Override
