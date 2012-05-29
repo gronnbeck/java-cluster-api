@@ -44,6 +44,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     private List<Space> spaces;
     private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
     private long startTime;
+    private Shared shared;
     
     
     protected SpaceProviderImpl() throws RemoteException {
@@ -86,6 +87,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     @Override
     public void registerSpace(Space space) throws RemoteException {
         System.out.println("A Space has connected itself to this SpaceProvider");
+        space.setShared(shared);
         spaces.add(space);
     }
 
@@ -111,7 +113,15 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
 		return info;
 	}
 
-	public static void main(String[] args) {
+    @Override
+    public void setShared(Shared<?> shared) throws RemoteException {
+        this.shared = shared;
+        for (Space space : spaces) {
+            space.setShared(shared);
+        }
+    }
+
+    public static void main(String[] args) {
         int port = 8887;
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());

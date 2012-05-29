@@ -38,5 +38,7 @@ public interface SpaceProvider extends Remote {
      */
     public String getInfo() throws RemoteException;
 
+    void setShared(Shared<?> shared) throws RemoteException;
+
 
 }

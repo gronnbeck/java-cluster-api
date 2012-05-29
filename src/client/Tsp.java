@@ -2,6 +2,7 @@ package client;
 
 import api.Result;
 import api.Space;
+import api.SpaceProvider;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
@@ -46,11 +47,11 @@ public class Tsp {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return;
 
-        int port = 8888;
+        int port = 8887;
         String url = args[0];
         Registry registry = LocateRegistry.getRegistry(url, port);
 
-        Space space = (Space) registry.lookup(Space.SERVICE_NAME);
+        SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
 
         double[][] coord =
                 {
