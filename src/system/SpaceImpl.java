@@ -44,11 +44,11 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 
         // test recover
-        recover();
-        // Start the State Writer..
         changed = false;
-        TimeCheckpoint timeCheckpoint = new TimeCheckpoint(this, 1, "/tmp/spaceimpl.data");
-        timeCheckpoint.start();
+        //recover();
+        // Start the State Writer..
+        //TimeCheckpoint timeCheckpoint = new TimeCheckpoint(this, 1, "/tmp/spaceimpl.data");
+        //timeCheckpoint.start();
 
         
         Thread computerThread = new Thread(this);
@@ -285,6 +285,11 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println("No recovery file was found. Continuing");
+            return;
+        }
+
+        if (state.continuationTasks.size() == 0 && state.shareds.size() == 0) {
+            System.out.println("Nothing to recover");
             return;
         }
 
