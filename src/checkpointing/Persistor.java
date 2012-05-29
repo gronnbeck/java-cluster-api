@@ -5,30 +5,20 @@ import java.util.ArrayList;
 
 public class Persistor {
 
-    private ArrayList<Serializable> objectList;
+    private State state;
     private String file;
 
     public Persistor(String file) {
-        objectList = new ArrayList<Serializable>();
         this.file = file;
     }
 
-    public void write() {
+    public void write(State state) throws IOException {
         String tmpFile = file + ".tmp";
-        IOHelpers.write(tmpFile, objectList);
+        IOHelpers.write(tmpFile, state);
         IOHelpers.renameFile(tmpFile, file);
     }
 
-    public void read() {
-        objectList = (ArrayList<Serializable>) IOHelpers.read(file);
+    public State read() throws ClassNotFoundException, IOException {
+        return (State) IOHelpers.read(file);
     }
-
-    public void add(Serializable object) {
-        objectList.add(object);
-    }
-
-    public ArrayList<Serializable> getObjectList() {
-        return (ArrayList<Serializable>) objectList.clone();
-    }
-
 }

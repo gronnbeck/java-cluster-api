@@ -22,13 +22,13 @@
     <mkdir dir="${dist}"/>
 
     <!-- Make computer jar file -->
-    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/** workpool/**"/>
+    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/**"/>
     
     <!-- Make client jar file -->
     <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/**"/>
   	
   	<!-- Make the space jar file -->
-  	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** workpool/**"/>
+  	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/**"/>
 	</target>
   	<target name="javadoc" description="create javadocs">
   		<javadoc packagenames="tasks.*,api.*" sourcepath="${src}" destdir="documents/javadoc" />

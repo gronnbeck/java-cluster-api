@@ -1,46 +1,44 @@
 package checkpointing;
 
-import java.io.Serializable;
-import java.util.Collection;
+import java.io.IOException;
 
 public class TimeCheckpoint<T> extends Thread {
 
     private long time;
     private String file;
     private Persistor persistor;
-    private boolean changed;
-    public TimeCheckpoint(String file, int min) {
+    private Recoverable recoverable;
+
+    public TimeCheckpoint(Recoverable recoverable, int min, String file) {
+        this.recoverable = recoverable;
         time = 1000*60*min;
-        changed = false;
+        this.file = file;
     }
 
 
-    private void setState(Collection<T> collection) {
-        for (T object : collection) {
-            if (!(object instanceof Serializable)) throw new IllegalArgumentException("Cannot serialize the following object: "+ object);
-            persistor.add((Serializable)object);
-        }
-        changed = true;
-    }
-
-    private void sleep() {
+    private boolean next() {
         try {
             sleep(time);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return true;
     }
 
     @Override
     public void run() {
         do {
-            sleep();
-
-            if (!changed) continue;
+            if (!recoverable.stateChanged()) continue;
             persistor = new Persistor(file);
-            persistor.write();
-            changed = false;
+            checkpointing.State state = recoverable.getState();
+
+            try {
+                persistor.write(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             System.out.println("Persisted SpaceImpl's State");
-        } while(true);
+        } while(next());
     }
 }

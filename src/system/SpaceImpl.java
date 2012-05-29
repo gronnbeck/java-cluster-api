@@ -1,19 +1,24 @@
 package system;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.*;
+import checkpointing.Persistor;
+import checkpointing.Recoverable;
+import checkpointing.State;
+import checkpointing.TimeCheckpoint;
 
-public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
+public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, Recoverable {
 
 	private static final long serialVersionUID = 1L;
 	private BlockingQueue<Result<?>> resultQue;
@@ -24,6 +29,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     private HashMap<String, BlockingQueue<Result>> resultQs;
     private Shared<?> shared;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
+    private boolean changed;
 
     public SpaceImpl() throws RemoteException {
         super();
@@ -35,6 +41,15 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
         computers = new ArrayList<Computer>();
         resultQs = new HashMap<String, BlockingQueue<Result>>();
         sharedMap = new ConcurrentHashMap<String, Shared<?>>();
+
+
+        // test recover
+        recover();
+        // Start the State Writer..
+        changed = false;
+        TimeCheckpoint timeCheckpoint = new TimeCheckpoint(this, 1, "/tmp/spaceimpl.data");
+        timeCheckpoint.start();
+
         
         Thread computerThread = new Thread(this);
         computerThread.start();
@@ -129,7 +144,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
 
     @Override
     public synchronized void registerContin(ContinuationTask continuation) throws RemoteException {
-
+        changed = true;
         for (Task task : continuation.getTasks()) {
             try {
                 // Ignore cached tasks.
@@ -226,9 +241,71 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable {
     	HashMap<String, String> info = new HashMap<String, String>();
     	
     	info.put("Computers_running", ((Integer)computers.size()).toString());
-    	
-    	
-    	
+
     	return null;
+    }
+
+    @Override
+    public State getState() {
+        ArrayList<ContinuationTask> cts = new ArrayList<ContinuationTask>();
+        ArrayList<Shared<?>> shareds = new ArrayList<Shared<?>>();
+
+        for (ContinuationTask ct : mapContin.values()) {
+            cts.add(ct);
+        }
+        for (Shared<?> s : sharedMap.values()) {
+            shareds.add(s);
+        }
+
+        return new SpaceState(cts, shareds);
+    }
+
+    @Override
+    public boolean stateChanged() {
+        return changed;
+    }
+
+    private void queueTask(Task task) {
+        try {
+            taskQue.put(task);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void recover() {
+        System.out.println("Trying to recover.");
+        mapContin = new ConcurrentHashMap<Object, ContinuationTask>();
+        Persistor persistor = new Persistor("/tmp/spaceimpl.data");
+
+        SpaceState state = null;
+        try {
+            state = (SpaceState)persistor.read();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("No recovery file was found. Continuing");
+            return;
+        }
+
+        System.out.println("Recovering Continuation Tasks");
+        for (ContinuationTask continuationTask : state.continuationTasks) {
+            System.out.println("  - Recovered: "+ continuationTask);
+            for (Task task : continuationTask.getTasks()) {
+                mapContin.put(task.getTaskIdentifier(), continuationTask);
+                queueTask(task);
+            }
+        }
+
+        System.out.println("Recovering Shareds");
+        for (Shared<?> shared : state.shareds) {
+            try {
+                sharedMap.put(shared.getJobId(), shared);
+                System.out.println("  - Recovered Shared for job: " + shared.getJobId());
+            } catch (RemoteException ignore_local_calls) {}
+        }
+
+
+        System.out.println("Done recovering");
     }
 }
