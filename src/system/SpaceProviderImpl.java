@@ -87,7 +87,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     @Override
     public void registerSpace(Space space) throws RemoteException {
         System.out.println("A Space has connected itself to this SpaceProvider");
-        space.setShared(shared);
+        if (shared != null) space.setShared(shared);
         spaces.add(space);
     }
 
@@ -106,10 +106,8 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     	for (Space space : spaces) {
     		space.getInfo();
 		}
-    	
     	info += "\rNumber of Computers: \n";
-    	
-    	
+
 		return info;
 	}
 

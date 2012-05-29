@@ -5,23 +5,40 @@ import api.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
-    // Tasks on Computer   (Concurrent HashMap)
-    // (Stealed) TaskQ     (BlockingQ w/ prio)
-
-    // ComputerProxy2SpaceTaskStealer
-    // run {
-    //    fetches task from Space if available
-    // }
-
-    // 1. Cache all subtasks (not waiting tasks aka cont's) at Computer
-    // 2. Execute tasks, and begin work-stealing
 
     private Computer computer;
     protected Space space;
     private Task cached;
+    private BlockingQueue<Task> taskQ;
+
+    private class TaskFetcher implements Runnable {
+        ComputerProxy computer;
+        private Space space;
+
+        public TaskFetcher(ComputerProxy computer, Space space) {
+            this.computer = computer;
+            this.space = space;
+        }
+
+
+        @Override
+        public void run() {
+            do {
+                try {
+                    Task task = space.takeTask();
+                    computer.taskQ.put(task);
+                } catch (RemoteException ignore) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while(true);
+        }
+    }
 
     /**
      * Creates a Proxy for handling Computers
@@ -33,8 +50,14 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        Thread t = new Thread(this);
-        t.start();
+        this.taskQ = new LinkedBlockingQueue<Task>();
+
+        // Start Computer Proxy threads
+        Thread cpThread = new Thread(this);
+        cpThread.start();
+
+        Thread tfThread = new Thread(new TaskFetcher(this, space));
+        tfThread.start();
     }
 
     @Override
@@ -157,7 +180,8 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         cached = null;
                     }
                 else {
-                    Task task = space.takeTask();
+                    //Task task = space.takeTask();
+                    Task task = taskQ.take();
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
@@ -173,7 +197,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             }
             catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
-            } catch (RemoteException ignore) {}
+            }
 
             lookForCachedResult(result);
             putResultToSpace(result);
