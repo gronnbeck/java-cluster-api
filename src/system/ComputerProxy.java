@@ -78,8 +78,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     private void handleFaultyComputer(Task task)  {
         // TODO add the process of handling prefetched tasks as well
-       giveTaskBack2Space(task);
-       deregisterComputer();
+        giveTaskBack2Space(task);
+        for (Task t : taskQ) {
+            giveTaskBack2Space(t);
+        }
+        deregisterComputer();
     }
 
     private void deregisterComputer() {
