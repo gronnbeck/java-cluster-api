@@ -27,6 +27,23 @@ public interface Result<T> extends Serializable {
      */
     String getTaskIdentifier();
 
+    /**
+     * The Owner of a result is the Space where a task is waiting for this result to be returned
+     * @param space the Space where a task is waiting for this result to be returned
+     */
+    void setOwner(Space space);
+
+    /**
+     * This method returns the owner (a space) of the resykt
+     * @return If it has an owner a Space is returned, else it will return null
+     */
+    Space getOwner();
+
+    /**
+     * If a client wants to use branch & bound on the system. They need add a jobId reference to the shared object.
+     * The id should be unique, if else, the system may return the wrong shared object.
+     * @return a unique job id as a String
+     */
     String getJobId();
 }
 

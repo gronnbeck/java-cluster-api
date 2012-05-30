@@ -1,6 +1,7 @@
 package api;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 
 public interface Task<T> extends Serializable {
     /**
@@ -66,5 +67,32 @@ public interface Task<T> extends Serializable {
      * @param jobId The job id of a task.
      */
     void setJobId(String jobId);
+
+
+    /**
+     * The Owner of a task is the Space where a task is waiting for that task to be executed.
+     * This method should only be called locally.
+     * @param space the space where a task is waiting for this task to be executed
+     */
+    void setOwner(Space space);
+
+    /**
+     * This method returns the owner (a space) of the task, should only be called locally
+     * @return If it has an owner a Space is returned, else it will return null
+     */
+    Space getOwner();
+
+    /**
+     * Returns the shared object for this type of task.
+     * @return
+     */
+    Shared getShared() throws RemoteException;
+
+    /**
+     * Sets the shared object of this task.
+     * This value is used to prune the search tree.
+     * @param shared
+     */
+    void setShared(Shared<?> shared) throws RemoteException;
 
 }

@@ -9,6 +9,7 @@ public abstract class TaskImpl implements Task {
     private String taskId;
     private String jobId;
 	private Computer computer;
+    private Space owner;
 	private boolean isCached;
 
     public TaskImpl() {
@@ -29,12 +30,30 @@ public abstract class TaskImpl implements Task {
     @Override
     public void setTaskIdentifier(String id) { this.taskId = id;}
 
+    @Override
 	abstract public Result<?> execute();
- 	public  Shared getShared() throws RemoteException { return computer.getShared(jobId); }
-	protected  void setShared( Shared<?> shared ) throws RemoteException { computer.setShared( shared ); }
-	public  void  setComputer( Computer computer ) { this.computer = computer; }
+
+    @Override
+ 	public Shared getShared() throws RemoteException { return computer.getShared(jobId); }
+
+    @Override
+	public void setShared(Shared shared ) throws RemoteException { computer.setShared( shared ); }
+
+    @Override
+    public  void  setComputer( Computer computer ) { this.computer = computer; }
+
+    @Override
 	public  void setCached(boolean bol){this.isCached = bol;}
+
+    @Override
 	public boolean getCached(){return this.isCached;}
+
+    @Override
+    public void setOwner(Space owner) { this.owner = owner; }
+
+    @Override
+    public Space getOwner() { return this.owner; }
+
 
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
