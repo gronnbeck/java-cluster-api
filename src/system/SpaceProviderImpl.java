@@ -91,6 +91,10 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     public void registerSpace(Space space) throws RemoteException {
         System.out.println("A Space has connected itself to this SpaceProvider");
         if (shared != null) space.setShared(shared);
+        for (Space aSpace : spaces) {
+            space.registerSpace(aSpace);
+            aSpace.registerSpace(space);
+        }
         spaces.add(space);
     }
 
@@ -98,6 +102,9 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     public void deregisterSpace(Space space) throws RemoteException {
         System.out.println("A Space has disconnected itself from this SpaceProvider");
         spaces.remove(space);
+        for (Space aSpace : spaces) {
+            aSpace.deregisterSpace(space);
+        }
     }
 
     @Override

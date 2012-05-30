@@ -17,7 +17,9 @@ public interface SpaceProvider extends Remote {
 
     /**
      * A space that want to distribute tasks to Computers must use this
-     * method to register itself to the clients SpaceProivder
+     * method to register itself to the clients SpaceProvider. The SpaceProvider then
+     * tells the Space which spaces that has already connected to this provider, and tells the
+     * other spaces that a space has connected
      * @param space The space that want to register it self to the SpaceProivder
      * @throws RemoteException
      */

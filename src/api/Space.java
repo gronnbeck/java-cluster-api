@@ -39,6 +39,21 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      */
     void publishTask(Task task) throws RemoteException, InterruptedException;
 
+    /**
+     * Register to this that a space is available
+     * @param space an other space that is available
+     * @throws RemoteException
+     */
+    void registerSpace(Space space) throws RemoteException;
+
+    /**
+     * When a space disconnects it should in- or directly tell the other spaces
+     * that it has shutdown.
+     * @param space the space that has disconnected
+     * @throws RemoteException
+     */
+    void deregisterSpace(Space space) throws RemoteException;
+
 
     Result getResult(String jobId) throws RemoteException, InterruptedException;
 
