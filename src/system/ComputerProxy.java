@@ -12,20 +12,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private static int WANT_TO_STEAL_SIZE = 2;
     private static int STEAL_ALLOWED_SIZE = 8;
 
-
-    public boolean want2Steal() {
-        return tasks.size() <= WANT_TO_STEAL_SIZE;
-    }
-
-    @Override
-    public Task stealTask() throws RemoteException {
-        return tasks.get(0);
-    }
-
-    public boolean canSteal() {
-        return tasks.size() >= STEAL_ALLOWED_SIZE;
-    }
-
     private Computer computer;
     protected Space space;
     private Task cached;
@@ -52,14 +38,31 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         cpThread.start();
     }
 
+    @Override
     public void registerComputer(Computer cp) throws RemoteException {
         System.out.println("Computer "+ Integer.toHexString(System.identityHashCode(cp)) +" registered to " + Integer.toHexString(System.identityHashCode(this)));
         otherComputers.add(cp);
     }
 
+    @Override
     public void deregisterComputer(Computer cp) throws RemoteException {
         System.out.println("Computer disconnected");
         otherComputers.remove(cp);
+
+    }
+
+    @Override
+    public boolean want2Steal() {
+        return tasks.size() <= WANT_TO_STEAL_SIZE;
+    }
+
+    @Override
+    public Task stealTask() throws RemoteException {
+        return tasks.get(0);
+    }
+
+    public boolean canSteal() {
+        return tasks.size() >= STEAL_ALLOWED_SIZE;
     }
 
     @Override
@@ -152,6 +155,32 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
+    private class TaskFetcher implements  Runnable {
+
+        private Space space;
+        private List<Task> tasks;
+        private int NUMBER_OF_TASKS_TO_PREFETCH = 20000;
+
+        public TaskFetcher(Space space, List<Task> tasks) {
+            this.space = space;
+            this.tasks = tasks;
+        }
+
+        @Override
+        public void run() {
+            int i = 0;
+            do {
+                try {
+                    Task task = space.takeTask();
+                    tasks.add(task);
+                } catch (RemoteException e) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while(i++ < NUMBER_OF_TASKS_TO_PREFETCH);    // TODO Finn ut hvorfor den deadlocker på while(true)
+        }
+    }
+
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
@@ -168,6 +197,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         WorkStealer workStealer = new WorkStealer(this, otherComputers, tasks);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
+
 
         do {
             Result result = null;
@@ -233,7 +263,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
             try {
             lookForCachedResult(result);
-            //queueTasks(result);    // This task breaks the parallelization
+            queueTasks(result);
             putResultToSpace(result);
             } catch (NullPointerException e) {
                 System.out.println("Some strang NullPointerException occurs.. Look at this later");
@@ -245,6 +275,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         if (result instanceof ContinuationResult) {
             ContinuationResult cr = (ContinuationResult) result;
             for (Task task : cr.getTaskReturnValue().getTasks()) {
+                if (tasks.size() > STEAL_ALLOWED_SIZE) break;
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
                 tasks.add(task);
