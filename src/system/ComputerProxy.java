@@ -11,6 +11,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     // TODO One should be able to config these
     private static int WANT_TO_STEAL_SIZE = 2;
     private static int STEAL_ALLOWED_SIZE = 8;
+    private static int TASK_LIST_MAX_SIZE = STEAL_ALLOWED_SIZE + 5;
 
     private Computer computer;
     protected Space space;
@@ -40,7 +41,8 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public void registerComputer(Computer cp) throws RemoteException {
-        System.out.println("Computer "+ Integer.toHexString(System.identityHashCode(cp)) +" registered to " + Integer.toHexString(System.identityHashCode(this)));
+        //System.out.println("Computer "+ Integer.toHexString(System.identityHashCode(cp)) +" registered to " + Integer.toHexString(System.identityHashCode(this)));
+        if (cp == this) return;
         otherComputers.add(cp);
     }
 
@@ -109,6 +111,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     private void giveTaskBack2Space(Task task) {
         try {
+            task.setCached(false);
             space.put(task);
         } catch (RemoteException ignore) {
         } catch (InterruptedException e) {
@@ -209,7 +212,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 } catch (RemoteException e) {
                     System.out.println("A computer crashed on checking if it had a cached task");
                     if (cached != null) {
-                        cached.setCached(false);
                         handleFaultyComputer(cached);
                     }
                     cached = null;
@@ -223,7 +225,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                                                             // Computer should be single threaded (Intended design)
                         } catch (RemoteException e) {
                             System.out.println("A computer has crashed. Putting the cached task back to space");
-                            cached.setCached(false);
                             handleFaultyComputer(cached);
                             running = false;
                             return;
@@ -246,7 +247,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     } catch (RemoteException e) {
                         System.out.println("A computer has crashed. Putting the currently running task back to space");
                         if (cached != null) {
-                            cached.setCached(false);
                             giveTaskBack2Space(cached);
                         }
                         handleFaultyComputer(task);
@@ -275,7 +275,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         if (result instanceof ContinuationResult) {
             ContinuationResult cr = (ContinuationResult) result;
             for (Task task : cr.getTaskReturnValue().getTasks()) {
-                if (tasks.size() > STEAL_ALLOWED_SIZE) break;
+                if (tasks.size() > TASK_LIST_MAX_SIZE) break;
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
                 tasks.add(task);

@@ -131,6 +131,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             return;
         }
 
+
         String id = result.getTaskIdentifier();
         if (mapContin.containsKey(id)) {
             ContinuationTask contin = mapContin.get(id);
@@ -144,13 +145,21 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 				}
                 
             }
+
         }
+
         // if not it is probably the end result (as I see it now)
         // in the case of fib. It should just be 1 number left
         else {
-            BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
-            resultFetcher.put(result);
+            if (resultQs.containsKey(result.getTaskIdentifier())) {
+                BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
+                resultFetcher.put(result);
+            } else {
+                System.out.println("Denne skal aldri bli kalt. Hvis den blir det, er det et delresultat som ikke skal komme hit" +
+                        "men mandelclient. Det er bare på Tsp og Fib denne strengen blir printet ut.. mmm muffins...");
+            }
         }
+
     }
 
     @Override
