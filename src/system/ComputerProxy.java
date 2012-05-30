@@ -12,79 +12,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private static int WANT_TO_STEAL_SIZE = 2;
     private static int STEAL_ALLOWED_SIZE = 8;
 
-    private class WorkStealer implements Runnable {
-
-        private int next;
-        private List<Computer> computers;
-        private List<Task> tasks;
-
-        public WorkStealer(List<Computer> computers, List<Task> tasks) {
-            this.computers = computers;
-            this.tasks = tasks;
-            this.next = 0;
-            this.backoff = 2;
-        }
-
-        private boolean hasComputers() throws RemoteException {
-            return computers.size() > 0;
-        }
-
-        private Computer selectComputer() throws RemoteException {
-            Random random = new Random();
-            next = random.nextInt(computers.size());
-            return computers.get(next);
-        }
-
-        private int backoff;
-        private final int MAX_BACKOFF_VALUE = 2000;
-        private void updateBackoff() {
-            if (backoff < MAX_BACKOFF_VALUE) backoff = backoff*backoff;
-            if (backoff > MAX_BACKOFF_VALUE) backoff = MAX_BACKOFF_VALUE;
-        }
-        private int getBackoff() {
-            return backoff;
-        }
-        private  void resetBackoff() {
-            backoff = 2;
-        }
-
-        @Override
-        public void run() {
-            do {
-                try {
-                    Thread.sleep(getBackoff());
-                } catch (InterruptedException e) { e.printStackTrace(); }
-
-                try {
-                    if (!hasComputers()) {
-                        updateBackoff();
-                        continue;
-                    }
-                    if (!want2Steal()) {
-                        //System.out.println("Have enough tasks. Don't want 2 steal");
-                        updateBackoff();
-                        continue;
-                    }
-                    Computer computer = selectComputer();
-                    //System.out.print("Trying to steal a task: ");
-                    if (computer.canSteal()) {
-                        Task task = computer.stealTask();
-                        this.tasks.add(task);
-                        resetBackoff();
-                        //System.out.println("Success");
-                    } else {
-                        //System.out.println("Failed");
-                        updateBackoff();
-                    }
-                } catch (RemoteException ignore) {}
-
-
-                // TODO: Handle if a computer is faulty
-
-            } while (true);
-        }
-    }
-
 
     public boolean want2Steal() {
         return tasks.size() <= WANT_TO_STEAL_SIZE;
@@ -238,7 +165,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
         // Start work stealing
-        WorkStealer workStealer = new WorkStealer(otherComputers, tasks);
+        WorkStealer workStealer = new WorkStealer(this, otherComputers, tasks);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
 
