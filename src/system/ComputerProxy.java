@@ -158,32 +158,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-    private class TaskFetcher implements  Runnable {
-
-        private Space space;
-        private List<Task> tasks;
-        private int NUMBER_OF_TASKS_TO_PREFETCH = 20000;
-
-        public TaskFetcher(Space space, List<Task> tasks) {
-            this.space = space;
-            this.tasks = tasks;
-        }
-
-        @Override
-        public void run() {
-            int i = 0;
-            do {
-                try {
-                    Task task = space.takeTask();
-                    tasks.add(task);
-                } catch (RemoteException e) {
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while(i++ < NUMBER_OF_TASKS_TO_PREFETCH);    // TODO Finn ut hvorfor den deadlocker på while(true)
-        }
-    }
-
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
