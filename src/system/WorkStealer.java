@@ -10,28 +10,24 @@ import java.util.Random;
 class WorkStealer implements Runnable {
 
     private int next;
-    private List<Computer> otherComputers;
-    private List<Task> tasks;
     private Computer computer;
     private int backOff;
     private final int MAX_BACKOFF_VALUE = 2000;
 
-    public WorkStealer(Computer computer, List<Computer> otherComputers, List<Task> tasks) {
+    public WorkStealer(Computer computer) {
         this.computer = computer;
-        this.otherComputers = otherComputers;
-        this.tasks = tasks;
         this.next = 0;
         this.backOff = 2;
     }
 
     private boolean hasComputers() throws RemoteException {
-        return otherComputers.size() > 0;
+        return computer.getComputers().size() > 0;
     }
 
     private Computer selectComputer() throws RemoteException {
         Random random = new Random();
-        next = random.nextInt(otherComputers.size());
-        return otherComputers.get(next);
+        next = random.nextInt(computer.getComputers().size());
+        return computer.getComputers().get(next);
     }
 
     private void updateBackoff() {
@@ -66,14 +62,14 @@ class WorkStealer implements Runnable {
                 }
 
                 Computer computer = selectComputer();
-                //System.out.print("Trying to steal a task: ");
+                //System.out.print("Trying to steal a task: ("+ computer.getTaskQ().size() +")");
                 if (computer.canSteal()) {
                     Task task = computer.stealTask();
-                    this.tasks.add(task);
+                    computer.addTask(task);
                     resetBackOff();
-                   // System.out.println("Success");
+                    //System.out.println("Success");
                 } else {
-                   // System.out.println("Failed");
+                    //System.out.println("Failed");
                     updateBackoff();
                 }
             } catch (RemoteException ignore) {}

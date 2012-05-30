@@ -3,6 +3,7 @@ package api;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.List;
 
 public interface Space extends Remote, Computer2Space, Task2Space {
     public static String SERVICE_NAME = "Space";
@@ -61,6 +62,13 @@ public interface Space extends Remote, Computer2Space, Task2Space {
      * @throws RemoteException
      */
     public String getId() throws RemoteException;
+
+    /**
+     * Gives the caller a cloned list of the computers running on the space
+     * @return returns a list of computers (as computer proxies)
+     * @throws RemoteException
+     */
+    public List<Computer> getComputers() throws RemoteException;
 
 
     Result getResult(String jobId) throws RemoteException, InterruptedException;

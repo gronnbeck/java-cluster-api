@@ -49,5 +49,6 @@ public interface Computer extends Remote, Serializable {
     public boolean canSteal() throws RemoteException;
     public boolean want2Steal() throws RemoteException;
     public Task stealTask() throws  RemoteException;
+    void addTask(Task task) throws RemoteException;
 
 }

@@ -176,4 +176,9 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public synchronized void addTask(Task task) throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

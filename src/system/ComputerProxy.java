@@ -9,16 +9,17 @@ import java.util.*;
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
     // TODO One should be able to config these
-    private static int WANT_TO_STEAL_SIZE = 2;
-    private static int STEAL_ALLOWED_SIZE = 8;
-    private static int TASK_LIST_MAX_SIZE = STEAL_ALLOWED_SIZE + 5;
+    public int WANT_TO_STEAL_SIZE = 2;
+    public int STEAL_ALLOWED_SIZE = 3;
+    private int TASK_LIST_MAX_SIZE = STEAL_ALLOWED_SIZE + 5;
 
     private Computer computer;
     protected Space space;
     private Task cached;
-    private List<Task> tasks;
+    private ArrayList<Task> tasks;
     private boolean running;
-    private List<Computer> otherComputers;
+    private ArrayList<Computer> otherComputers;
+
 
     /**
      * Creates a Proxy for handling Computers
@@ -30,51 +31,59 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.tasks = Collections.synchronizedList(new ArrayList<Task>());
+        this.tasks = new ArrayList<Task>();    // FIX THESE TO BE THREADSAFE
         this.running = true;
-        this.otherComputers = Collections.synchronizedList(new ArrayList<Computer>());
+        this.otherComputers = new ArrayList<Computer>();
 
-        // Start Computer Proxy threads
+        start();
+    }
+
+    public void start() {
         Thread cpThread = new Thread(this);
         cpThread.start();
     }
 
     @Override
-    public void registerComputer(Computer cp) throws RemoteException {
+    public synchronized void registerComputer(Computer cp) throws RemoteException {
         //System.out.println("Computer "+ Integer.toHexString(System.identityHashCode(cp)) +" registered to " + Integer.toHexString(System.identityHashCode(this)));
         if (cp == this) return;
         otherComputers.add(cp);
     }
 
     @Override
-    public void deregisterComputer(Computer cp) throws RemoteException {
+    public synchronized void deregisterComputer(Computer cp) throws RemoteException {
         System.out.println("Computer disconnected");
         otherComputers.remove(cp);
 
     }
 
     @Override
-    public boolean want2Steal() {
+    public synchronized boolean want2Steal() {
         return tasks.size() <= WANT_TO_STEAL_SIZE;
     }
 
     @Override
-    public Task stealTask() throws RemoteException {
-        return tasks.get(0);
+    public synchronized Task stealTask() throws RemoteException {
+        return tasks.remove(0);
     }
 
-    public boolean canSteal() {
+    @Override
+    public synchronized void addTask(Task task) throws RemoteException {
+        this.tasks.add(task);
+    }
+
+    public synchronized boolean canSteal() {
         return tasks.size() >= STEAL_ALLOWED_SIZE;
     }
 
     @Override
-    public List<Computer> getComputers() throws RemoteException {
-        return otherComputers;
+    public List<Task> getTaskQ() throws RemoteException {
+        return (List<Task>) tasks.clone();
     }
 
     @Override
-    public List<Task> getTaskQ() throws RemoteException {
-        return tasks;
+    public List<Computer> getComputers() throws RemoteException {
+        return (List<Computer>) otherComputers.clone();
     }
 
     @Override
@@ -170,7 +179,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
         // Start work stealing
-        WorkStealer workStealer = new WorkStealer(this, otherComputers, tasks);
+        WorkStealer workStealer = new WorkStealer(this);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
 
@@ -212,8 +221,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     else {
                         task = tasks.remove(0);
                     }
-                    //System.out.println("Waiting for task. status: [Cached Task: " + (cached != null) + "], [Q.size: " + taskQ.size() + "]");
-                    //Task task = taskQ.take();
 
                     try {
                         result = execute(task);

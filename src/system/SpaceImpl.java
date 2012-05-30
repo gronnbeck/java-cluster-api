@@ -79,6 +79,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void registerSpace(Space space) throws RemoteException {
         // TODO: Create a Space proxy to talk to instead
+        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
         spaces.put(space.getId(), space);
         System.out.println("A Space has registered itself");
     }
@@ -92,6 +93,11 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public String getId() throws RemoteException {
         return id;
+    }
+
+    @Override
+    public List<Computer> getComputers() throws RemoteException {
+        return (List<Computer>) computers.clone();
     }
 
     @Override
@@ -122,13 +128,15 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
         if(this.shared != null) computer.setShared(this.shared);
         computers.add(computer);
+        // Start the ComputerProxy which steals task from other Spaces
         System.out.println("The space computer is successfully registred!");
 
     }
 
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
-        Computer proxy = new ComputerProxy(computer, this);
+        ComputerProxy proxy = new ComputerProxy(computer, this);
+
         if(this.shared != null) proxy.setShared(this.shared);
         // TODO This is a bit hacky..
         for (Computer c : computers) {
@@ -156,6 +164,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
         // Bah comparing string is slow :/
         if (!result.getOwnerId().equals(getId())) {
+            System.out.println("got result for another space");
             Space proxy = spaces.get(result.getOwnerId());      // Assumes that Space in spaces is a spaceProxy
             proxy.putResult(result);
         }
@@ -242,9 +251,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             spaceProvider.registerSpace(space);
             System.out.println("Space connected to SpaceProvider at " + host);
 
-
-
-
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -272,22 +278,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 				    computer.setShared(shared);
 			}
 		}
-	}
-
-    @Override
-	public void run() {
-			try {
-				//So far this doesn't solve normal task. Only tasks that are marked as simple
-				//TODO: Add support for normal tasks as well!
-				//Currently all continuation tasks are set to simple.. So all the contination tasks will be executed in space!
-				Computer comp = new ComputerImpl(this);
-				SpaceComputer spaceComputer = new SpaceComputer(comp,this);
-				this.registerSpaceComputer(spaceComputer);
-				
-			} catch (RemoteException ignore) { }
-			
-
-		
 	}
     
     public HashMap<String, String> getInfo() {
@@ -365,5 +355,18 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 
         System.out.println("Done recovering");
+    }
+
+    @Override
+    public void run() {
+        try {
+            //So far this doesn't solve normal task. Only tasks that are marked as simple
+            //TODO: Add support for normal tasks as well!
+            //Currently all continuation tasks are set to simple.. So all the contination tasks will be executed in space!
+            Computer comp = new ComputerImpl(this);
+            SpaceComputer spaceComputer = new SpaceComputer(comp,this);
+            this.registerSpaceComputer(spaceComputer);
+
+        } catch (RemoteException ignore) { }
     }
 }
