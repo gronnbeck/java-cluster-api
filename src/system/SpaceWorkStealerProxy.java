@@ -4,8 +4,6 @@ package system;
 import api.*;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
@@ -37,38 +35,29 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
 
     }
 
+    @Override
+    public List<Computer> getComputers() throws RemoteException {
+        return otherSpace.getComputers();
+    }
+
+    @Override
     public void start() {
         Thread thread = new Thread(this);
         thread.start();
     }
 
+    @Override
     public void run() {
         try {
-            List<Computer> otherComputers = Collections.synchronizedList(otherSpace.getComputers());
-            List<Task> tasks = new ArrayList<Task>();
+            thisSpace.register(this);
+        } catch (RemoteException ignore) { }
 
-            try {
-                thisSpace.register(this);
-            } catch (RemoteException ignore) { }
+        WorkStealer workStealer = new WorkStealer(this);
+        Thread wsThread = new Thread(workStealer);
+        wsThread.start();
 
-            WorkStealer workStealer = new WorkStealer(this);
-            Thread wsThread = new Thread(workStealer);
-            //wsThread.start();
-        } catch (RemoteException e) {
-            System.out.println("Was not able to get the computer list from the other space. Shutting down workstealer");
-            return;
-        }
         System.out.println("Started a SpaceWorkStealer to start stealing tasks from another space");
-        while (true) {
-            try {
-                Thread.sleep(3000);
-                Thread.yield();
-                System.out.println("Stolen task size: " + getTaskQ().size());
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (RemoteException ignore) {
-            }
-        }
+
     }
 
 }

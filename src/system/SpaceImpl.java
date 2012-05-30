@@ -113,7 +113,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
   
     @Override
-    public Task<?> takeSimpleTask() throws InterruptedException{
+    public Task<?> takeSimpleTask() throws InterruptedException {
     	return simpleTaskQue.take();
     }
 
@@ -136,7 +136,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
         ComputerProxy proxy = new ComputerProxy(computer, this);
-
         if(this.shared != null) proxy.setShared(this.shared);
         // TODO This is a bit hacky..
         for (Computer c : computers) {
