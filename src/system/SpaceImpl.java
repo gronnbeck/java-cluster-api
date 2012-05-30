@@ -170,14 +170,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
         String id = result.getTaskIdentifier();
         if (waitingTasks.containsKey(id)) {
-            ContinuationTask contin = waitingTasks.get(id);
-            contin.ready(result);
+            ContinuationTask continuation = waitingTasks.get(id);
+            continuation.ready(result);
             waitingTasks.remove(id);
-            if (contin.isReady()) {
-            	if (contin.isSimple()) {
-					simpleTaskQue.put(contin);
+            if (continuation.isReady()) {
+            	if (continuation.isSimple()) {
+					simpleTaskQue.put(continuation);
 				} else {
-					taskQue.put(contin);
+					taskQue.put(continuation);
 				}
             }
         }
