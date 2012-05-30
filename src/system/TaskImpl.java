@@ -38,6 +38,7 @@ public abstract class TaskImpl implements Task {
 
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
+        continuationTask.setJobId(getJobId());
         for (Task task : continuationTask.getTasks()) {
             task.setJobId(this.jobId);
         }

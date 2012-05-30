@@ -65,12 +65,16 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     @Override
-    public Result publishTask(Task task) throws RemoteException, InterruptedException {
-        resultQs.put(task.getTaskIdentifier(), new LinkedBlockingQueue<Result>());
+    public void publishTask(Task task) throws RemoteException, InterruptedException {
+        if (!resultQs.containsKey(task.getJobId())) resultQs.put(task.getJobId(), new LinkedBlockingQueue<Result>());
         put(task);
-        return resultQs.get(task.getTaskIdentifier()).take();
     }
 
+    @Override
+    public Result getResult(String jobId) throws RemoteException, InterruptedException {
+        BlockingQueue<Result> resultQ = resultQs.get(jobId);
+        return resultQ.take();
+    }
 
 
     @Override
@@ -151,8 +155,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         // if not it is probably the end result (as I see it now)
         // in the case of fib. It should just be 1 number left
         else {
-            if (resultQs.containsKey(result.getTaskIdentifier())) {
-                BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
+            System.out.println(result.getJobId());
+            if (resultQs.containsKey(result.getJobId())) {
+                BlockingQueue<Result> resultFetcher = resultQs.get(result.getJobId());
                 resultFetcher.put(result);
             } else {
                 System.out.println("Denne skal aldri bli kalt. Hvis den blir det, er det et delresultat som ikke skal komme hit" +

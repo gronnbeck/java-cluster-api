@@ -17,20 +17,21 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
 
     private class TaskPublisher extends Thread {
 
-        String id;
         Task task;
         Space space;
-        public TaskPublisher(String id, Task task, Space space){
+        public TaskPublisher(Task task, Space space){
             this.task = task;
             this.space = space;
-            this.id = id;
         }
 
         @Override
         public void run() {
             try {
-                Result result = space.publishTask(task);
-                resultQs.get(id).put(result);
+                space.publishTask(task);
+                do {
+                    Result result = space.getResult(jobid);
+                    resultQ.put(result);
+                } while(true);
             } catch (RemoteException e) {
                 System.out.println("Have assumed that a Space will never shutdown unexpectedly. Exiting.");
                 System.exit(0);
@@ -42,15 +43,18 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     }
 
     private List<Space> spaces;
-    private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
+    private BlockingQueue<Result> resultQ;
+   // private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
     private long startTime;
     private Shared shared;
+    private String jobid;
     
     
     protected SpaceProviderImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
-        resultQs = new ConcurrentHashMap<String, BlockingQueue<Result>>();
+        resultQ = new LinkedBlockingQueue<Result>();
+        //resultQs = new ConcurrentHashMap<String, BlockingQueue<Result>>();
         
         startTime = System.nanoTime();
     }
@@ -58,16 +62,15 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     @Override
     public Result publishTask(Task task) throws RemoteException, InterruptedException {
         System.out.println("A task was published to SpaceProvider");
+        jobid = task.getJobId();
+        System.out.println(jobid);
         Result result = task.execute();
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            String taskId = continuationTask.getTaskIdentifier();
-            BlockingQueue<Result> resultQ = new LinkedBlockingQueue<Result>();
-            resultQs.put(taskId, resultQ);
             int counter = 0;
             System.out.println("Breaking up task into subtasks");
             for (Task currentTask : continuationTask.getTasks()) {
-                TaskPublisher taskPublisher = new TaskPublisher(taskId, currentTask, spaces.get(counter));
+                TaskPublisher taskPublisher = new TaskPublisher(currentTask, spaces.get(counter));
                 taskPublisher.start();
                 counter = (counter + 1) % spaces.size();
             }

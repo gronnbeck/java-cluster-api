@@ -12,7 +12,7 @@ public class MandelResult extends ResultImpl{
      * @param id the id corresponding to the task this result belongs to
      */
 	public MandelResult(int[][] count, String id) {
-		super(id);
+		super(id, "");
 		this.count = count;
 	}
 	
@@ -21,5 +21,10 @@ public class MandelResult extends ResultImpl{
 	public Object getTaskReturnValue() {
 		return count;
 	}
+
+    @Override
+    public String getJobId() {
+        throw new IllegalAccessError("Not implemented");
+    }
 
 }

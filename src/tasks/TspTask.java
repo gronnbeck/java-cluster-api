@@ -109,7 +109,7 @@ public class TspTask extends TaskImpl implements Serializable  {
       //  System.out.println(path.size());
       //  System.out.println(lowerbound.getLowerBound() + " > " + getSharedValue());
         if (lowerbound.getLowerBound() > getSharedValue()) {
-            return new PruneResult(getTaskIdentifier());
+            return new PruneResult(getTaskIdentifier(), getJobId());
         }
 
          if (cities.size() < tspBaseCase) {

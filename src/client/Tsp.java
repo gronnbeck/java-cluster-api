@@ -88,7 +88,8 @@ public class Tsp {
         space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();
-        TspResult result =  (TspResult) space.publishTask(tspTask);
+        TspResult result = null;
+        //(TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

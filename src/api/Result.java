@@ -26,5 +26,7 @@ public interface Result<T> extends Serializable {
      * @return an integer representing the task this result belongs to
      */
     String getTaskIdentifier();
+
+    String getJobId();
 }
 

@@ -4,7 +4,7 @@ package system;
 import api.ContinuationTask;
 import api.Result;
 
-public class ContinuationResult implements Result<ContinuationTask> {
+public class ContinuationResult extends ResultImpl {
 
 
     private ContinuationTask task;
@@ -12,8 +12,10 @@ public class ContinuationResult implements Result<ContinuationTask> {
     private long elapsedTime;
 
     protected ContinuationResult(ContinuationTask task) {
+        super(task.getTaskIdentifier(), task.getJobId());
         this.task = task;
         this.id = task.getTaskIdentifier();
+
     }
 
     @Override

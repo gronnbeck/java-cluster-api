@@ -9,7 +9,7 @@ public class TspResult extends ResultImpl {
     private ArrayList<Integer> path;
 
     public TspResult(ArrayList<Integer> path, double cost, String id) {
-    	super(id);
+    	super(id, "");
         this.path = path;
         this.cost = cost;
     }
@@ -20,6 +20,11 @@ public class TspResult extends ResultImpl {
      */
     public Pair<Double, ArrayList<Integer>> getTaskReturnValue() {
         return new Pair<Double, ArrayList<Integer>>(cost, path);
+    }
+
+    @Override
+    public String getJobId() {
+        throw new IllegalAccessError("Not Implemented");
     }
 
 }

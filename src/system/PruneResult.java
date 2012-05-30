@@ -2,11 +2,12 @@ package system;
 
 import api.Result;
 
-public class PruneResult implements Result {
+public class PruneResult extends ResultImpl {
 
     private String id;
 
-    public PruneResult(String id) {
+    public PruneResult(String id, String jobId) {
+        super(id,jobId);
         this.id = id;
     }
 

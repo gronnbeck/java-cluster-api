@@ -3,6 +3,8 @@ package tasks;
 import api.Result;
 import api.Task;
 import java.util.ArrayList;
+
+import system.ContinuationResult;
 import system.TaskImpl;
 
 public class FibTask extends TaskImpl {
@@ -25,14 +27,15 @@ public class FibTask extends TaskImpl {
     @Override
     public Result execute() {
         if (num < 2) {
-            return new FibResult(num, getTaskIdentifier());
+            return new FibResult(num, getTaskIdentifier(), getJobId());
         }
         Task fib1 = new FibTask(num - 1);
         Task fib2 = new FibTask(num - 2);
         ArrayList<Task> tasks = new ArrayList<Task>();
         tasks.add(fib1);
         tasks.add(fib2);
-        
+
+        ContinuationResult cr = createContinuationResult(new FibContin(tasks));
         return createContinuationResult(new FibContin(tasks));
     }
 
