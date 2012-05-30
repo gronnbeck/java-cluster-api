@@ -22,6 +22,9 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
         this.thisSpace = thisSpace;
         this.otherSpace = otherSpace;
         super.STEAL_ALLOWED_SIZE = STEAL_ALLOWED_SIZE;
+        super.WANT_TO_STEAL_SIZE = 3;
+
+        thisSpace.register(this);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
             thisSpace.register(this);
         } catch (RemoteException ignore) { }
 
-        WorkStealer workStealer = new WorkStealer(this);
+        WorkStealer workStealer = new WorkStealer(this, true);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
 

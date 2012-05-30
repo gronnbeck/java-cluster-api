@@ -79,7 +79,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void registerSpace(Space space) throws RemoteException {
         // TODO: Create a Space proxy to talk to instead
-        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
+        //Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
         spaces.put(space.getId(), space);
         System.out.println("A Space has registered itself");
     }
@@ -135,7 +135,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
-        ComputerProxy proxy = new ComputerProxy(computer, this);
+        ComputerProxy proxy = null;
+        if (!(computer instanceof ComputerProxy)) {
+            proxy = new ComputerProxy(computer, this);
+        } else {
+            System.out.println("registering a cp");
+            proxy = (ComputerProxy) computer;
+        }
+
         if(this.shared != null) proxy.setShared(this.shared);
         // TODO This is a bit hacky..
         for (Computer c : computers) {
@@ -272,7 +279,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         System.out.println("Trying to update shared");
 		if (checkAndSetSharedThreadSafe(shared)) {
             System.out.println("Updating shared");
-			this.shared = shared;
 			for (Computer computer : computers) {
 				    computer.setShared(shared);
 			}

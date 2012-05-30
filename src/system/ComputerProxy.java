@@ -10,7 +10,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     // TODO One should be able to config these
     public int WANT_TO_STEAL_SIZE = 2;
-    public int STEAL_ALLOWED_SIZE = 3;
+    public int STEAL_ALLOWED_SIZE = 4;
     private int TASK_LIST_MAX_SIZE = STEAL_ALLOWED_SIZE + 5;
 
     private Computer computer;

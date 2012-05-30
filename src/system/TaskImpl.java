@@ -37,7 +37,7 @@ public abstract class TaskImpl implements Task {
  	public Shared getShared() throws RemoteException { return computer.getShared(jobId); }
 
     @Override
-	public void setShared(Shared shared ) throws RemoteException { computer.setShared( shared ); }
+	public void setShared(Shared shared) throws RemoteException { computer.setShared(shared); }
 
     @Override
     public  void  setComputer( Computer computer ) { this.computer = computer; }

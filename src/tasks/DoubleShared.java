@@ -2,7 +2,7 @@ package tasks;
 import api.Shared;
 import system.SharedImpl;
 
-public class DoubleShared extends SharedImpl<Double> {
+public class DoubleShared extends SharedImpl {
     private double val;
 
     public DoubleShared(double val, String jobId) {
@@ -20,5 +20,7 @@ public class DoubleShared extends SharedImpl<Double> {
     public Double getValue() {
         return val;
     }
+
+
 
 }

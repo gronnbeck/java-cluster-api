@@ -23,12 +23,11 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
-		
 		long taskStartTime = System.nanoTime();
 		
         task.setComputer(this);
+
         Result result = task.execute();
-        
         result.setTaskRunTime(taskStartTime);
         
         // TODO This part can be more elegant

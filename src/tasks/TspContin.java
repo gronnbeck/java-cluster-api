@@ -16,7 +16,6 @@ public class TspContin extends ContinuationTaskImpl {
     private int currentCity;
     private boolean simple;
 
-  
 
 	public TspContin(int currentCity, ArrayList<Task> tasks) {
         super(tasks);
@@ -47,7 +46,6 @@ public class TspContin extends ContinuationTaskImpl {
             if (!(result instanceof PruneResult)) {
                 results.add(result);
             }
-
             taskMap.remove(result.getTaskIdentifier());
         }
     }
@@ -55,7 +53,7 @@ public class TspContin extends ContinuationTaskImpl {
     @Override
     public Result<TspResult> execute() {
 
-        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE, getTaskIdentifier());
+        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE, getTaskIdentifier(), getJobId());
         double minCost = Double.MAX_VALUE;
 
         for (Result currentResult : results) {
@@ -77,9 +75,10 @@ public class TspContin extends ContinuationTaskImpl {
 
         path.add(0, currentCity);
 
-        Result result = new TspResult(path, minCost, getTaskIdentifier());
+        Result result = new TspResult(path, minCost, getTaskIdentifier(), getJobId());
         //Hmm this one will probably be overwritten. TODO look into it
         result.setTaskRunTime(getTaskRunTime());
+        result.setOwnerId(getOwnerId());
         return result;
 
     }

@@ -22,10 +22,10 @@
     <mkdir dir="${dist}"/>
 
     <!-- Make computer jar file -->
-    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/**"/>
+    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/**"/>
     
     <!-- Make client jar file -->
-    <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/**"/>
+    <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/** checkpointing/**"/>
   	
   	<!-- Make the space jar file -->
   	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/**"/>

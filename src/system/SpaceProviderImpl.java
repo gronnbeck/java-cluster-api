@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider {
+public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider, Computer {
 
     private class TaskPublisher extends Thread {
 
@@ -48,42 +48,22 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     private long startTime;
     private Shared shared;
     private String jobid;
+    private Computer computer;
     
     
     protected SpaceProviderImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
         resultQ = new LinkedBlockingQueue<Result>();
-        //resultQs = new ConcurrentHashMap<String, BlockingQueue<Result>>();
-        
         startTime = System.nanoTime();
     }
 
     @Override
     public Result publishTask(Task task) throws RemoteException, InterruptedException {
-        System.out.println("A task was published to SpaceProvider");
-        jobid = task.getJobId();
-        System.out.println(jobid);
-        Result result = task.execute();
-        if (result instanceof ContinuationResult) {
-            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            int counter = 0;
-            System.out.println("Breaking up task into subtasks");
-            for (Task currentTask : continuationTask.getTasks()) {
-                TaskPublisher taskPublisher = new TaskPublisher(currentTask, spaces.get(counter));
-                taskPublisher.start();
-                counter = (counter + 1) % spaces.size();
-            }
-            System.out.println("Waiting for results");
-            for (int i = 0; i < continuationTask.getTasks().size(); i++) {
-                Result subResult = resultQ.take();
-                continuationTask.ready(subResult);
-                System.out.println(i+1+"/"+continuationTask.getTasks().size()+" results received.");
-            }
-            result = continuationTask.execute();
-            System.out.println("  done.");
-        }
-
+        // Just publish a task to a random space, and let the workstealing begin
+        Space space  = spaces.get(0);
+        space.publishTask(task);
+        Result result = space.getResult(task.getJobId());
         return result;
     }
 
@@ -129,6 +109,12 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         }
     }
 
+    @Override
+    public Shared getShared(String id) throws RemoteException {
+        return shared;
+    }
+
+
     public static void main(String[] args) {
         int port = 8887;
         if (System.getSecurityManager() == null) {
@@ -138,7 +124,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
             SpaceProvider spaceProvider = new SpaceProviderImpl();
 
             Registry reg = LocateRegistry.createRegistry(port);
-            reg.rebind(SERVICE_NAME, spaceProvider);
+            reg.rebind(SpaceProvider.SERVICE_NAME, spaceProvider);
             System.out.println("SpaceProvider is online!");
 
         } catch (RemoteException e) {
@@ -146,4 +132,76 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Result<?> execute(Task<?> task) throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void stop() throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean hasCached() throws RemoteException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Result executeCachedTask() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Space getSpace() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void setSpace(Space space) throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void registerComputer(Computer cp) throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deregisterComputer(Computer cp) throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<Computer> getComputers() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<Task> getTaskQ() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean canSteal() throws RemoteException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean want2Steal() throws RemoteException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Task stealTask() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void addTask(Task task) throws RemoteException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
 }

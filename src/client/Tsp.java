@@ -47,12 +47,13 @@ public class Tsp {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return;
 
-        int port = 8888;
+        int port = 8887;
         String url = args[0];
         Registry registry = LocateRegistry.getRegistry(url, port);
 
-        //SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
-        Space space = (Space) registry.lookup(Space.SERVICE_NAME);
+        SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
+
+
 
         double[][] coord =
                 {
@@ -85,11 +86,14 @@ public class Tsp {
         
         TspTask tspTask = new TspTask(coord);
         Double upperBound = findUpperBound(coord);
+
         space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
+
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();
-        TspResult result = null;
-        //(TspResult) space.publishTask(tspTask);
+
+
+        TspResult result = (TspResult) space.publishTask(tspTask);
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

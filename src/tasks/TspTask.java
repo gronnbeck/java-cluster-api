@@ -11,6 +11,8 @@ import system.TaskImpl;
 
 public class TspTask extends TaskImpl implements Serializable  {
 
+
+    // TODO: make thos configureable
     private static int levels = 2;
     private int tspBaseCase;
     private double[][] coordinates;
@@ -53,6 +55,7 @@ public class TspTask extends TaskImpl implements Serializable  {
 
     protected TspTask(double[][] coordinates, ArrayList<Integer> citiesNotVisited, int currentCity, double cost,
                       ArrayList<Integer> path) {
+        super();
         this.tspBaseCase = coordinates.length - levels;
         this.coordinates = coordinates;
         cities = citiesNotVisited;
@@ -109,7 +112,9 @@ public class TspTask extends TaskImpl implements Serializable  {
       //  System.out.println(path.size());
       //  System.out.println(lowerbound.getLowerBound() + " > " + getSharedValue());
         if (lowerbound.getLowerBound() > getSharedValue()) {
-            return new PruneResult(getTaskIdentifier(), getJobId());
+            PruneResult pr = new PruneResult(getTaskIdentifier(), getJobId());
+            pr.setOwnerId(getOwnerId());
+            return pr;
         }
 
          if (cities.size() < tspBaseCase) {
@@ -129,7 +134,9 @@ public class TspTask extends TaskImpl implements Serializable  {
                  }
              }
 
-             return new TspResult(minPath, minCost, getTaskIdentifier());
+             TspResult tr = new TspResult(minPath, minCost, getTaskIdentifier(), getJobId());
+             tr.setOwnerId(getOwnerId());
+             return tr;
          }
 
         ArrayList<Task> subtasks = new ArrayList<Task>();

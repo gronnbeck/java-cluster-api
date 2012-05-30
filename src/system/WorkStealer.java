@@ -13,12 +13,19 @@ class WorkStealer implements Runnable {
     private Computer computer;
     private int backOff;
     private final int MAX_BACKOFF_VALUE = 2000;
+    private boolean print;
 
     public WorkStealer(Computer computer) {
         this.computer = computer;
         this.next = 0;
         this.backOff = 2;
     }
+
+    public WorkStealer(Computer computer, boolean print) {
+        this(computer);
+        this.print = print;
+    }
+
 
     private boolean hasComputers() throws RemoteException {
         return computer.getComputers().size() > 0;
@@ -62,14 +69,14 @@ class WorkStealer implements Runnable {
                 }
 
                 Computer computer = selectComputer();
-                //System.out.print("Trying to steal a task: ("+ computer.getTaskQ().size() +")");
+                if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQ().size() +")");
                 if (computer.canSteal()) {
                     Task task = computer.stealTask();
                     computer.addTask(task);
                     resetBackOff();
-                    //System.out.println("Success");
+                    if (print) System.out.println("Success");
                 } else {
-                    //System.out.println("Failed");
+                    if (print) System.out.println("Failed");
                     updateBackoff();
                 }
             } catch (RemoteException ignore) {}
