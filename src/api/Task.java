@@ -72,15 +72,15 @@ public interface Task<T> extends Serializable {
     /**
      * The Owner of a task is the Space where a task is waiting for that task to be executed.
      * This method should only be called locally.
-     * @param space the space where a task is waiting for this task to be executed
+     * @param ownerId the space where a task is waiting for this task to be executed
      */
-    void setOwner(Space space);
+    void setOwnerId(String ownerId);
 
     /**
      * This method returns the owner (a space) of the task, should only be called locally
      * @return If it has an owner a Space is returned, else it will return null
      */
-    Space getOwner();
+    String getOwnerId();
 
     /**
      * Returns the shared object for this type of task.

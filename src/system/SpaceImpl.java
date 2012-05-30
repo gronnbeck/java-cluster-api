@@ -15,7 +15,6 @@ import api.*;
 import checkpointing.Persistor;
 import checkpointing.Recoverable;
 import checkpointing.State;
-import tasks.FibResult;
 
 public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, Recoverable {
 
@@ -74,7 +73,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void publishTask(Task task) throws RemoteException, InterruptedException {
         if (!resultQs.containsKey(task.getJobId())) resultQs.put(task.getJobId(), new LinkedBlockingQueue<Result>());
-        task.setOwner(this);
+        task.setOwnerId(getId());
         put(task);
     }
 
@@ -158,8 +157,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
         try {
             // Bah comparing string is slow :/
-        if (!result.getOwner().getId().equals(getId())) {
-            Space proxy = spaces.get(result.getOwner().getId());      // Assumes that Space in spaces is a spaceProxy
+        if (!result.getOwnerId().equals(getId())) {
+            Space proxy = spaces.get(result.getOwnerId());      // Assumes that Space in spaces is a spaceProxy
             System.out.println(proxy);
             proxy.putResult(result);
         }

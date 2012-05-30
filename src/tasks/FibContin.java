@@ -1,10 +1,8 @@
 package tasks;
 
-import api.ContinuationTask;
 import api.Result;
 import api.Task;
-import api.Task2Space;
-import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import system.ContinuationTaskImpl;
 
@@ -46,7 +44,7 @@ public class FibContin extends ContinuationTaskImpl {
         // TODO One should not have to send the jobId with the init.
         Result<Integer> result = new FibResult(sum, getTaskIdentifier(), getJobId());
         result.setTaskRunTime(getTaskRunTime());
-        result.setOwner(getOwner());
+        result.setOwnerId(getOwnerId());
 
         return result;
     }

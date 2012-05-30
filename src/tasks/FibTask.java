@@ -28,7 +28,7 @@ public class FibTask extends TaskImpl {
     public Result execute() {
         if (num < 2) {
             FibResult result = new FibResult(num, getTaskIdentifier(), getJobId());
-            result.setOwner(getOwner());
+            result.setOwnerId(getOwnerId());
             return result;
         }
         Task fib1 = new FibTask(num - 1);

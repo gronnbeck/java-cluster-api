@@ -9,7 +9,7 @@ public abstract class TaskImpl implements Task {
     private String taskId;
     private String jobId;
 	private Computer computer;
-    private Space owner;
+    private String ownerId;
 	private boolean isCached;
 
     public TaskImpl() {
@@ -49,22 +49,22 @@ public abstract class TaskImpl implements Task {
 	public boolean getCached(){return this.isCached;}
 
     @Override
-    public void setOwner(Space owner) { this.owner = owner; }
+    public void setOwnerId(String owner) { this.ownerId = owner; }
 
     @Override
-    public Space getOwner() { return this.owner; }
+    public String getOwnerId() { return this.ownerId; }
 
 
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
         continuationTask.setJobId(getJobId());
-        continuationTask.setOwner(getOwner());
+        continuationTask.setOwnerId(getOwnerId());
         for (Task task : continuationTask.getTasks()) {
             task.setJobId(this.jobId);
-            task.setOwner(getOwner());
+            task.setOwnerId(getOwnerId());
         }
         ContinuationResult cr = new ContinuationResult(continuationTask);
-        cr.setOwner(getOwner());
+        cr.setOwnerId(getOwnerId());
         return cr;
     }
 

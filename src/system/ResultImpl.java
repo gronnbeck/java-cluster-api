@@ -1,14 +1,13 @@
 package system;
 
 import api.Result;
-import api.Space;
 
 public abstract class ResultImpl implements Result{
 	
 	protected long taskTime;
 	protected String id;
     private String jobId;
-    private Space owner;
+    private String ownerId;
 
     public ResultImpl(String id, String jobId) {
 		this.id = id;
@@ -36,9 +35,9 @@ public abstract class ResultImpl implements Result{
     }
 
     @Override
-    public void setOwner(Space owner) { this.owner = owner; }
+    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
 
     @Override
-    public Space getOwner() { return this.owner; }
+    public String getOwnerId() { return this.ownerId; }
 	
 }
