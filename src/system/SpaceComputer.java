@@ -23,11 +23,7 @@ public class SpaceComputer extends ComputerProxy implements Runnable{
                 Task task = space.takeSimpleTask();
                 try {
                 	Result r = execute(task);
-                    try {
-                        space.putResult(r);
-                    } catch (NullPointerException e) {
-                        System.out.println("[SpaceComputer] Some strange nullpointer exception");
-                    }
+                    space.putResult(r);
                 } catch (RemoteException e) {
                     System.out.println("WTF!?");
 					return;          // exit thread

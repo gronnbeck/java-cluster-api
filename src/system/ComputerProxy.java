@@ -108,7 +108,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         return computer.executeCachedTask();
     }
 
-
     private void giveTaskBack2Space(Task task) {
         try {
             task.setCached(false);
@@ -233,15 +232,9 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
             } catch (RemoteException ignore){}
 
-
-
-            try {
             lookForCachedResult(result);
             queueTasks(result);
             putResultToSpace(result);
-            } catch (NullPointerException e) {
-                System.out.println("Some strang NullPointerException occurs.. Look at this later");
-            }
         } while(running);
     }
 

@@ -8,13 +8,11 @@ public class ContinuationResult extends ResultImpl {
 
 
     private ContinuationTask task;
-    private String id;
     private long elapsedTime;
 
     protected ContinuationResult(ContinuationTask task) {
         super(task.getTaskIdentifier(), task.getJobId());
         this.task = task;
-        this.id = task.getTaskIdentifier();
 
     }
 
@@ -31,10 +29,5 @@ public class ContinuationResult extends ResultImpl {
     @Override
     public long getTaskRunTime() {
         return task.getTaskRunTime();
-    }
-
-    @Override
-    public String getTaskIdentifier() {
-        return id;
     }
 }

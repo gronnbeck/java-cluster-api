@@ -55,6 +55,14 @@ public interface Space extends Remote, Computer2Space, Task2Space {
     void deregisterSpace(Space space) throws RemoteException;
 
 
+    /**
+     * Returns the unique id of a Space
+     * @return the unique id of a Space as a string
+     * @throws RemoteException
+     */
+    public String getId() throws RemoteException;
+
+
     Result getResult(String jobId) throws RemoteException, InterruptedException;
 
     

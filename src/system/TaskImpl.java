@@ -58,10 +58,14 @@ public abstract class TaskImpl implements Task {
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
         continuationTask.setJobId(getJobId());
+        continuationTask.setOwner(getOwner());
         for (Task task : continuationTask.getTasks()) {
             task.setJobId(this.jobId);
+            task.setOwner(getOwner());
         }
-        return new ContinuationResult(continuationTask);
+        ContinuationResult cr = new ContinuationResult(continuationTask);
+        cr.setOwner(getOwner());
+        return cr;
     }
 
 }
