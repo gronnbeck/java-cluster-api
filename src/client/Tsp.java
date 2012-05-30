@@ -51,6 +51,7 @@ public class Tsp {
         String url = args[0];
         Registry registry = LocateRegistry.getRegistry(url, port);
 
+        //SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
         double[][] coord =
@@ -73,8 +74,8 @@ public class Tsp {
         		{4,4},
         		{5,1},
         		{5,2},
-        		{5,3},
-        		{5,4},
+//        		{5,3},
+//        		{5,4},
 //                {6,1},
 //                {6,2},
 //                {6,3},

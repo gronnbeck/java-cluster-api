@@ -75,17 +75,15 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
     @Override
     public Task<?> takeTask() throws RemoteException, InterruptedException {
-        Task task =taskQue.take();
-        System.out.println("task given. TaskQ.size: " + taskQue.size());
-        return task;
+        return taskQue.take();
     }
   
     @Override
     public Task<?> takeSimpleTask() throws InterruptedException{
     	return simpleTaskQue.take();
     }
-    
-    
+
+
     @Override
     public synchronized void stop() throws RemoteException {
         for (Computer computer : computers) {
@@ -93,24 +91,35 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         }
     }
 
+    private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
+        if(this.shared != null) computer.setShared(this.shared);
+        computers.add(computer);
+        System.out.println("The space computer is successfully registred!");
+
+    }
+
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
         Computer proxy = new ComputerProxy(computer, this);
         if(this.shared != null) proxy.setShared(this.shared);
+        // TODO This is a bit hacky..
+        for (Computer c : computers) {
+            if (!(c instanceof SpaceComputer)) {
+                c.registerComputer(proxy);
+                proxy.registerComputer(c);
+            }
+        }
         computers.add(proxy);
         System.out.println("A computer has registered it self");
     }
-    
-    private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
-    	if(this.shared != null) computer.setShared(this.shared);
-    	computers.add(computer);
-    	System.out.println("The space computer is successfully registred!");
-    	
-    }
+
 
     @Override
     public synchronized void deregister(Computer computer) throws RemoteException {
         computers.remove(computer); // a cproxy here as well
+        for (Computer c : computers) {
+            c.deregisterComputer(computer);
+        }
     }
 
     @Override
@@ -121,6 +130,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             registerContin(continuationTask);
             return;
         }
+
 
         String id = result.getTaskIdentifier();
         if (mapContin.containsKey(id)) {
@@ -135,13 +145,21 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 				}
                 
             }
+
         }
+
         // if not it is probably the end result (as I see it now)
         // in the case of fib. It should just be 1 number left
         else {
-            BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
-            resultFetcher.put(result);
+            if (resultQs.containsKey(result.getTaskIdentifier())) {
+                BlockingQueue<Result> resultFetcher = resultQs.get(result.getTaskIdentifier());
+                resultFetcher.put(result);
+            } else {
+                System.out.println("Denne skal aldri bli kalt. Hvis den blir det, er det et delresultat som ikke skal komme hit" +
+                        "men mandelclient. Det er bare på Tsp og Fib denne strengen blir printet ut.. mmm muffins...");
+            }
         }
+
     }
 
     @Override

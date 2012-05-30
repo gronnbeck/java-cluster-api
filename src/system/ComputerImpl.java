@@ -3,10 +3,7 @@ package system;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import api.*;
@@ -136,12 +133,47 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     @Override
     public Space getSpace() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
     }
 
     @Override
     public void setSpace(Space space) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public void registerComputer(Computer cp) throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public void deregisterComputer(Computer cp) throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public List<Computer> getComputers() throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public List<Task> getTaskQ() throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public boolean canSteal() throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public boolean want2Steal() throws RemoteException {
+        throw new IllegalAccessError("Method not implemented in ComputerImpl");
+    }
+
+    @Override
+    public Task stealTask() throws RemoteException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }
