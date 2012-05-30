@@ -3,6 +3,7 @@ package api;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public interface Computer extends Remote, Serializable {
     String SERVICE_NAME = "computer";
@@ -40,5 +41,13 @@ public interface Computer extends Remote, Serializable {
     // Dont know if we need this anymore?
     Space getSpace() throws RemoteException;
 	void setSpace(Space space) throws RemoteException;
+
+    public void registerComputer(Computer cp) throws RemoteException;
+    public void deregisterComputer(Computer cp) throws RemoteException;
+    public List<Computer> getComputers() throws RemoteException;
+    public List<Task> getTaskQ() throws RemoteException;
+    public boolean canSteal() throws RemoteException;
+    public boolean want2Steal() throws RemoteException;
+    public Task stealTask() throws  RemoteException;
 
 }

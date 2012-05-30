@@ -4,21 +4,111 @@ import api.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
+    // TODO One should be able to config these
+    private static int WANT_TO_STEAL_SIZE = 50;
+    private static int STEAL_ALLOWED_SIZE = 2;
+
+    private class WorkStealer implements Runnable {
+
+        private int next;
+        private List<Computer> computers;
+        private List<Task> tasks;
+
+        public WorkStealer(List<Computer> computers, List<Task> tasks) {
+            this.computers = computers;
+            this.tasks = tasks;
+            this.next = 0;
+            this.backoff = 2;
+        }
+
+        private boolean hasComputers() throws RemoteException {
+            return computers.size() > 0;
+        }
+
+        private Computer selectComputer() throws RemoteException {
+            Random random = new Random();
+            next = random.nextInt(computers.size());
+            return computers.get(next);
+        }
+
+        private int backoff;
+        private final int MAX_BACKOFF_VALUE = 2000;
+        private void updateBackoff() {
+            if (backoff < MAX_BACKOFF_VALUE) backoff = backoff*backoff;
+            if (backoff > MAX_BACKOFF_VALUE) backoff = MAX_BACKOFF_VALUE;
+        }
+        private int getBackoff() {
+            return backoff;
+        }
+        private  void resetBackoff() {
+            backoff = 2;
+        }
+
+        @Override
+        public void run() {
+            do {
+                try {
+                    Thread.sleep(getBackoff());
+                } catch (InterruptedException e) { e.printStackTrace(); }
+
+                try {
+                    if (!hasComputers()) {
+                        updateBackoff();
+                        continue;
+                    }
+                    if (!want2Steal()) {
+                        //System.out.println("Have enough tasks. Don't want 2 steal");
+                        updateBackoff();
+                        continue;
+                    }
+                    Computer computer = selectComputer();
+                    //System.out.print("Trying to steal a task: ");
+                    if (computer.canSteal()) {
+                        Task task = computer.stealTask();
+                        this.tasks.add(task);
+                        resetBackoff();
+                        //System.out.println("Success");
+                    } else {
+                        //System.out.println("Failed");
+                        updateBackoff();
+                    }
+                } catch (RemoteException ignore) {}
+
+
+                // TODO: Handle if a computer is faulty
+
+            } while (true);
+        }
+    }
+
+
+    public boolean want2Steal() {
+        return taskQ.size() <= WANT_TO_STEAL_SIZE;
+    }
+
+    @Override
+    public Task stealTask() throws RemoteException {
+        return taskQ.get(0);
+    }
+
+    public boolean canSteal() {
+        return taskQ.size() >= STEAL_ALLOWED_SIZE;
+    }
 
     private Computer computer;
     protected Space space;
     private Task cached;
-    private Stack<Task> taskQ;
+    private List<Task> taskQ;
+    private boolean running;
+    private List<Computer> otherComputers;
 
     /**
      * Creates a Proxy for handling Computers
-     * @param computer The computer you wish to proxy
+     * @param computer The computer you wish to computer
      * @param space On what space the tasks and results are published
      */
     public ComputerProxy(Computer computer, Space space) throws RemoteException {
@@ -26,12 +116,33 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.taskQ = new Stack<Task>();
+        this.taskQ = Collections.synchronizedList(new ArrayList<Task>());
+        this.running = true;
+        this.otherComputers = Collections.synchronizedList(new ArrayList<Computer>());
 
         // Start Computer Proxy threads
         Thread cpThread = new Thread(this);
         cpThread.start();
+    }
 
+    public void registerComputer(Computer cp) throws RemoteException {
+        System.out.println("Computer "+ Integer.toHexString(System.identityHashCode(cp)) +" registered to " + Integer.toHexString(System.identityHashCode(this)));
+        otherComputers.add(cp);
+    }
+
+    public void deregisterComputer(Computer cp) throws RemoteException {
+        System.out.println("Computer disconnected");
+        otherComputers.remove(cp);
+    }
+
+    @Override
+    public List<Computer> getComputers() throws RemoteException {
+        return otherComputers;
+    }
+
+    @Override
+    public List<Task> getTaskQ() throws RemoteException {
+        return taskQ;
     }
 
     @Override
@@ -119,15 +230,19 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
      * It waits on a client to publish a task. When a task is published
      * it tires to assign the task to its corresponding Computer.
      * If the computer returns a result it sends the result back to the space.
-     * However, if the Computer raises a RemoteException this proxy puts the
+     * However, if the Computer raises a RemoteException this computer puts the
      * task back into the space, and deregisters it self.
      */
     public void run() {
         // TODO Clean!
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
-        do {
+        // Start work stealing
+        WorkStealer workStealer = new WorkStealer(otherComputers, taskQ);
+        Thread wsThread = new Thread(workStealer);
+        wsThread.start();
 
+        do {
             Result result = null;
             // if computer has a cached task execute that one. If not get one from space
             try {
@@ -141,6 +256,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         handleFaultyComputer(cached);
                     }
                     cached = null;
+                    running = false;
                     return;
                 }
                 if (hasCached && cached != null) {
@@ -152,17 +268,18 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                             System.out.println("A computer has crashed. Putting the cached task back to space");
                             cached.setCached(false);
                             handleFaultyComputer(cached);
+                            running = false;
                             return;
                         }
                         cached = null;
                     }
                 else {
                     Task task;
-                    if (taskQ.empty()) {
+                    if (taskQ.size() <= 0) {
                         task = space.takeTask();
                     }
                     else {
-                        task = taskQ.pop();
+                        task = taskQ.remove(0);
                     }
                     //System.out.println("Waiting for task. status: [Cached Task: " + (cached != null) + "], [Q.size: " + taskQ.size() + "]");
                     //Task task = taskQ.take();
@@ -176,7 +293,8 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                             giveTaskBack2Space(cached);
                         }
                         handleFaultyComputer(task);
-                        return;          // exit thread . The proxy is no longer needed
+                        running = false;
+                        return;          // exit thread . The computer is no longer needed
                     }
                 }
             }
@@ -185,20 +303,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             } catch (RemoteException ignore){}
 
 
-
+            if (result == null) continue;
 
             lookForCachedResult(result);
             queueTasks(result);
-            try {
-                putResultToSpace(result);
-            } catch(NullPointerException e) {
-                System.out.println("here");
-                e.printStackTrace();
-                return;
-            }
-
-
-        } while(true);
+            putResultToSpace(result);
+        } while(running);
     }
 
     private void queueTasks(Result result) {
@@ -207,7 +317,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             for (Task task : cr.getTaskReturnValue().getTasks()) {
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
-                taskQ.push(task);
+                taskQ.add(task);
             }
         }
     }

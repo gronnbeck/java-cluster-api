@@ -82,8 +82,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     public Task<?> takeSimpleTask() throws InterruptedException{
     	return simpleTaskQue.take();
     }
-    
-    
+
+
     @Override
     public synchronized void stop() throws RemoteException {
         for (Computer computer : computers) {
@@ -91,24 +91,35 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         }
     }
 
+    private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
+        if(this.shared != null) computer.setShared(this.shared);
+        computers.add(computer);
+        System.out.println("The space computer is successfully registred!");
+
+    }
+
     @Override
     public synchronized void register(Computer computer) throws RemoteException {
         Computer proxy = new ComputerProxy(computer, this);
         if(this.shared != null) proxy.setShared(this.shared);
+        // TODO This is a bit hacky..
+        for (Computer c : computers) {
+            if (!(c instanceof SpaceComputer)) {
+                c.registerComputer(proxy);
+                proxy.registerComputer(c);
+            }
+        }
         computers.add(proxy);
         System.out.println("A computer has registered it self");
     }
-    
-    private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
-    	if(this.shared != null) computer.setShared(this.shared);
-    	computers.add(computer);
-    	System.out.println("The space computer is successfully registred!");
-    	
-    }
+
 
     @Override
     public synchronized void deregister(Computer computer) throws RemoteException {
         computers.remove(computer); // a cproxy here as well
+        for (Computer c : computers) {
+            c.deregisterComputer(computer);
+        }
     }
 
     @Override
