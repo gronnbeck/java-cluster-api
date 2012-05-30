@@ -87,22 +87,22 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
 
     public boolean want2Steal() {
-        return taskQ.size() <= WANT_TO_STEAL_SIZE;
+        return tasks.size() <= WANT_TO_STEAL_SIZE;
     }
 
     @Override
     public Task stealTask() throws RemoteException {
-        return taskQ.get(0);
+        return tasks.get(0);
     }
 
     public boolean canSteal() {
-        return taskQ.size() >= STEAL_ALLOWED_SIZE;
+        return tasks.size() >= STEAL_ALLOWED_SIZE;
     }
 
     private Computer computer;
     protected Space space;
     private Task cached;
-    private List<Task> taskQ;
+    private List<Task> tasks;
     private boolean running;
     private List<Computer> otherComputers;
 
@@ -116,7 +116,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.taskQ = Collections.synchronizedList(new ArrayList<Task>());
+        this.tasks = Collections.synchronizedList(new ArrayList<Task>());
         this.running = true;
         this.otherComputers = Collections.synchronizedList(new ArrayList<Computer>());
 
@@ -142,7 +142,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public List<Task> getTaskQ() throws RemoteException {
-        return taskQ;
+        return tasks;
     }
 
     @Override
@@ -190,7 +190,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private void handleFaultyComputer(Task task)  {
         // TODO add the process of handling prefetched tasks as well
         giveTaskBack2Space(task);
-        for (Task t : taskQ) {
+        for (Task t : tasks) {
             giveTaskBack2Space(t);
         }
         deregisterComputer();
@@ -238,7 +238,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         // I think this method has become too complex. Is there a way we can simply it?
         System.out.println("ComputerProxy running");
         // Start work stealing
-        WorkStealer workStealer = new WorkStealer(otherComputers, taskQ);
+        WorkStealer workStealer = new WorkStealer(otherComputers, tasks);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
 
@@ -275,11 +275,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                     }
                 else {
                     Task task;
-                    if (taskQ.size() <= 0) {
+                    if (tasks.size() <= 0) {
                         task = space.takeTask();
                     }
                     else {
-                        task = taskQ.remove(0);
+                        task = tasks.remove(0);
                     }
                     //System.out.println("Waiting for task. status: [Cached Task: " + (cached != null) + "], [Q.size: " + taskQ.size() + "]");
                     //Task task = taskQ.take();
@@ -320,7 +320,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             for (Task task : cr.getTaskReturnValue().getTasks()) {
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
-                taskQ.add(task);
+                tasks.add(task);
             }
         }
     }
