@@ -306,7 +306,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
             try {
             lookForCachedResult(result);
-            queueTasks(result);
+            //queueTasks(result);    // This task breaks the parallelization
             putResultToSpace(result);
             } catch (NullPointerException e) {
                 System.out.println("Some strang NullPointerException occurs.. Look at this later");
