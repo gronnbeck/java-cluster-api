@@ -9,8 +9,8 @@ import java.util.*;
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
     // TODO One should be able to config these
-    private static int WANT_TO_STEAL_SIZE = 50;
-    private static int STEAL_ALLOWED_SIZE = 2;
+    private static int WANT_TO_STEAL_SIZE = 2;
+    private static int STEAL_ALLOWED_SIZE = 8;
 
     private class WorkStealer implements Runnable {
 
@@ -303,11 +303,14 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             } catch (RemoteException ignore){}
 
 
-            if (result == null) continue;
 
+            try {
             lookForCachedResult(result);
             queueTasks(result);
             putResultToSpace(result);
+            } catch (NullPointerException e) {
+                System.out.println("Some strang NullPointerException occurs.. Look at this later");
+            }
         } while(running);
     }
 
