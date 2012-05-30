@@ -49,7 +49,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         computers = new ArrayList<Computer>();
 
         spaces = new ConcurrentHashMap<String, Space>();
-
         // test recover
         changed = false;
         //recover();
@@ -155,16 +154,10 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     public synchronized void putResult(Result result) throws RemoteException, InterruptedException {
     	if (result == null) return;
 
-        try {
-            // Bah comparing string is slow :/
+        // Bah comparing string is slow :/
         if (!result.getOwnerId().equals(getId())) {
             Space proxy = spaces.get(result.getOwnerId());      // Assumes that Space in spaces is a spaceProxy
-            System.out.println(proxy);
             proxy.putResult(result);
-        }
-        } catch (NullPointerException e) {
-            System.out.println("here");
-            System.exit(0);
         }
 
         // else continue to process result
@@ -183,17 +176,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             if (contin.isReady()) {
             	if (contin.isSimple()) {
 					simpleTaskQue.put(contin);
-				}else{
+				} else {
 					taskQue.put(contin);
 				}
-                
             }
-
         }
         else {
             // if not it is probably the end result (as I see it now)
             // in the case of fib. It should just be 1 number left
-
             System.out.println(result.getJobId());
             if (resultQs.containsKey(result.getJobId())) {
                 BlockingQueue<Result> resultFetcher = resultQs.get(result.getJobId());
