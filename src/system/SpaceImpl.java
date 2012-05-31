@@ -80,8 +80,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void registerSpace(Space space) throws RemoteException {
         // TODO: Create a Space proxy to talk to instead
-        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
-        spaces.put(space.getId(), space);
+        Space proxy = new SpaceProxy(space);
+        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, proxy);
+        spaces.put(proxy.getId(), proxy);
         System.out.println("A Space has registered itself");
     }
 
