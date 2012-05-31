@@ -6,8 +6,7 @@ public class FibResult extends ResultImpl {
 
     private int result;
     
-    public FibResult(int result, String id, String jobId){
-    	super(id, jobId);
+    public FibResult(int result){
         this.result = result;
     }
     @Override

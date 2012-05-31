@@ -8,8 +8,7 @@ public class TspResult extends ResultImpl {
     private double cost;
     private ArrayList<Integer> path;
 
-    public TspResult(ArrayList<Integer> path, double cost, String id, String jobid) {
-    	super(id, jobid);
+    public TspResult(ArrayList<Integer> path, double cost) {
         this.path = path;
         this.cost = cost;
     }

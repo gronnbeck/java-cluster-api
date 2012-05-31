@@ -110,8 +110,7 @@ public class TspTask extends TaskImpl implements Serializable  {
      */
     public Result execute() {
         if (lowerbound.getLowerBound() > getSharedValue()) {
-            PruneResult pr = new PruneResult(getTaskIdentifier(), getJobId());
-            pr.setOwnerId(getOwnerId());
+            Result pr = createResult(new PruneResult());
             return pr;
         }
 
@@ -132,9 +131,7 @@ public class TspTask extends TaskImpl implements Serializable  {
                  }
              }
 
-             TspResult tr = new TspResult(minPath, minCost, getTaskIdentifier(), getJobId());
-             tr.setOwnerId(getOwnerId());
-             return tr;
+             return createResult(new TspResult(minPath, minCost));
          }
 
         ArrayList<Task> subtasks = new ArrayList<Task>();

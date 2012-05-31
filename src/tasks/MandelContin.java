@@ -66,7 +66,7 @@ public class MandelContin extends ContinuationTaskImpl {
 		}
 		Result res = new MandelResult(count, getTaskIdentifier());
 		res.setTaskRunTime(getTaskRunTime());
-		return res;
+		return  createResult(res);
 	}
 
 	@Override

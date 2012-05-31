@@ -53,7 +53,7 @@ public class TspContin extends ContinuationTaskImpl {
     @Override
     public Result<TspResult> execute() {
 
-        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE, getTaskIdentifier(), getJobId());
+        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE);
         double minCost = Double.MAX_VALUE;
 
         for (Result currentResult : results) {
@@ -75,11 +75,7 @@ public class TspContin extends ContinuationTaskImpl {
 
         path.add(0, currentCity);
 
-        Result result = new TspResult(path, minCost, getTaskIdentifier(), getJobId());
-        //Hmm this one will probably be overwritten. TODO look into it
-        result.setTaskRunTime(getTaskRunTime());
-        result.setOwnerId(getOwnerId());
-        return result;
+        return createResult(new TspResult(path, minCost));
 
     }
 

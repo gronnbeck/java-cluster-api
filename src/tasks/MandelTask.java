@@ -69,7 +69,7 @@ public class MandelTask extends TaskImpl implements Serializable{
 		        sx=lowerX;
 		        sy+=step;
 		    }
-		return new MandelResult(count, id);
+		return createResult(new MandelResult(count, id));
 		
 		}//END-IF
 		//Split into 4 new subtasks!

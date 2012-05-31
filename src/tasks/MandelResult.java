@@ -5,6 +5,7 @@ import system.ResultImpl;
 public class MandelResult extends ResultImpl{
 	
 	private int[][] count;
+    private String id;
 
     /**
      * An object to store the result of solving a MandelbrotSet Task.
@@ -12,9 +13,9 @@ public class MandelResult extends ResultImpl{
      * @param id the id corresponding to the task this result belongs to
      */
 	public MandelResult(int[][] count, String id) {
-		super(id, "");
 		this.count = count;
-	}
+        this.id = id;
+    }
 	
 
 	@Override
@@ -23,8 +24,9 @@ public class MandelResult extends ResultImpl{
 	}
 
     @Override
-    public String getJobId() {
-        throw new IllegalAccessError("Not implemented");
+    public String getTaskIdentifier() {
+        return id;
     }
+
 
 }

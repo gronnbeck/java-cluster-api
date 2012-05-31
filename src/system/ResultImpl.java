@@ -9,35 +9,31 @@ public abstract class ResultImpl implements Result{
     private String jobId;
     private String ownerId;
 
-    public ResultImpl(String id, String jobId) {
-		this.id = id;
-        this.jobId = jobId;
-    }
-
     @Override
-    public void setTaskRunTime(long elapsed_time) {
-        taskTime = elapsed_time;
-    }
+    public void setTaskRunTime(long elapsed_time) { taskTime = elapsed_time; }
 
 	@Override
-	public long getTaskRunTime() {
-		return taskTime;
-	}
+	public long getTaskRunTime() { return taskTime; }
+
 
 	@Override
-	public String getTaskIdentifier() {
-		return id;
-	}
+	public String getTaskIdentifier() { return id; }
 
     @Override
-    public String getJobId() {
-        return jobId;
-    }
+    public void setTaskIdentifier(String taskIdentifier) { this.id = taskIdentifier; }
+
+    @Override
+    public String getJobId() { return jobId; }
+
+    @Override
+    public void setJobId(String jobId) { this.jobId = jobId; }
 
     @Override
     public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
 
     @Override
     public String getOwnerId() { return this.ownerId; }
+
+
 	
 }

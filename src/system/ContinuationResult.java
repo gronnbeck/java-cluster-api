@@ -11,7 +11,6 @@ public class ContinuationResult extends ResultImpl {
     private long elapsedTime;
 
     protected ContinuationResult(ContinuationTask task) {
-        super(task.getTaskIdentifier(), task.getJobId());
         this.task = task;
 
     }

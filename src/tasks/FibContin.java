@@ -36,15 +36,14 @@ public class FibContin extends ContinuationTaskImpl {
 
 
     @Override
-    public Result<Integer> execute() {
+    public Result execute() {
         int sum = 0;
         for (Result<Integer> res : results) {
             sum += res.getTaskReturnValue();
         }
         // TODO One should not have to send the jobId with the init.
-        Result<Integer> result = new FibResult(sum, getTaskIdentifier(), getJobId());
+        Result result =  createResult(new FibResult(sum));
         result.setTaskRunTime(getTaskRunTime());
-        result.setOwnerId(getOwnerId());
 
         return result;
     }

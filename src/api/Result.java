@@ -27,11 +27,14 @@ public interface Result<T> extends Serializable {
      */
     String getTaskIdentifier();
 
+    void setTaskIdentifier(String taskIdentifier);
+
     /**
      * The Owner of a result is the Space where a task is waiting for this result to be returned
      * @param ownerId the Space where a task is waiting for this result to be returned
      */
     void setOwnerId(String ownerId);
+
 
     /**
      * This method returns the owner (a space) of the resykt
@@ -45,5 +48,9 @@ public interface Result<T> extends Serializable {
      * @return a unique job id as a String
      */
     String getJobId();
+
+    void setJobId(String jobId);
+
+
 }
 
