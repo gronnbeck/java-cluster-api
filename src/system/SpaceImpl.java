@@ -15,6 +15,7 @@ import api.*;
 import checkpointing.Persistor;
 import checkpointing.Recoverable;
 import checkpointing.State;
+import tasks.FibResult;
 
 public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, Recoverable {
 
@@ -79,7 +80,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void registerSpace(Space space) throws RemoteException {
         // TODO: Create a Space proxy to talk to instead
-        //Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
+        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, space);
         spaces.put(space.getId(), space);
         System.out.println("A Space has registered itself");
     }
@@ -173,6 +174,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             System.out.println("got result for another space");
             Space proxy = spaces.get(result.getOwnerId());      // Assumes that Space in spaces is a spaceProxy
             proxy.putResult(result);
+            return;
         }
 
         // else continue to process result

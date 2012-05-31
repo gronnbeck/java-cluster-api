@@ -22,7 +22,7 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
         this.thisSpace = thisSpace;
         this.otherSpace = otherSpace;
         super.STEAL_ALLOWED_SIZE = STEAL_ALLOWED_SIZE;
-        super.WANT_TO_STEAL_SIZE = 3;
+        super.WANT_TO_STEAL_SIZE = 5;
 
         thisSpace.register(this);
     }
@@ -50,6 +50,17 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
     }
 
     @Override
+    public void addTask(Task task) {
+        try {
+            thisSpace.put(task);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    @Override
     public void run() {
         try {
             thisSpace.register(this);
@@ -60,6 +71,17 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
         wsThread.start();
 
         System.out.println("Started a SpaceWorkStealer to start stealing tasks from another space");
+
+        while (true) {
+            try {
+                Thread.sleep(5000);
+                System.out.println("tasksize for this proxy: " + getTaskQ().size());
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (RemoteException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
 
     }
 

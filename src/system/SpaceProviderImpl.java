@@ -63,8 +63,7 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         // Just publish a task to a random space, and let the workstealing begin
         Space space  = spaces.get(0);
         space.publishTask(task);
-        Result result = space.getResult(task.getJobId());
-        return result;
+        return space.getResult(task.getJobId());
     }
 
     @Override
