@@ -55,6 +55,7 @@ public abstract class TaskImpl implements Task {
     public String getOwnerId() { return this.ownerId; }
 
 
+    @Override
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
         continuationTask.setJobId(getJobId());
@@ -70,6 +71,7 @@ public abstract class TaskImpl implements Task {
         return cr;
     }
 
+    @Override
     public Result createResult(Result aResult) {
         aResult.setTaskIdentifier(getTaskIdentifier());
         aResult.setJobId(getJobId());

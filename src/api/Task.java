@@ -95,6 +95,23 @@ public interface Task<T> extends Serializable {
      */
     void setShared(Shared<?> shared) throws RemoteException;
 
+    /**
+     * Every ContinuationTask (ct) must be returned as a ContinuationResult.
+     * When a ct is passed through this method all its dependencies such as job/task/owner id
+     * is handeled automatically
+     * @param continuationTask The task which should be past as a new tak
+     * @return A ContinuationResult containing the corresponding continuation task.
+     */
+    Result createContinuationResult(ContinuationTask continuationTask);
+
+    /**
+     * Every result from a task should be passed through this filter. This filter adds the needed
+     * job/task/owner ids.
+     * @param result A result that a task wants to return
+     * @return a result wrapped with the right job/task/owner ids
+     */
+    Result createResult(Result result);
+
 
 
 }

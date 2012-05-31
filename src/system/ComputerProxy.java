@@ -259,15 +259,4 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    @Override
-    public Space getSpace() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setSpace(Space space) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-
 }

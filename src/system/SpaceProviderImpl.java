@@ -126,16 +126,6 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
     }
 
     @Override
-    public Space getSpace() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setSpace(Space space) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void registerComputer(Computer cp) throws RemoteException {
         //To change body of implemented methods use File | Settings | File Templates.
     }

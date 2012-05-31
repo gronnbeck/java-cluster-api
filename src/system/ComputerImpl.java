@@ -129,16 +129,6 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	}
 
     @Override
-    public Space getSpace() throws RemoteException {
-        throw new IllegalAccessError("Method not implemented in ComputerImpl");
-    }
-
-    @Override
-    public void setSpace(Space space) throws RemoteException {
-        throw new IllegalAccessError("Method not implemented in ComputerImpl");
-    }
-
-    @Override
     public void registerComputer(Computer cp) throws RemoteException {
         throw new IllegalAccessError("Method not implemented in ComputerImpl");
     }
