@@ -11,7 +11,6 @@ import api.*;
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
     private Space space;
-    private Shared<?> shared;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
     private Task cached;
 
