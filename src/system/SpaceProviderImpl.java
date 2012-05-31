@@ -15,33 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider, Computer {
 
-    private class TaskPublisher extends Thread {
-
-        Task task;
-        Space space;
-        public TaskPublisher(Task task, Space space){
-            this.task = task;
-            this.space = space;
-        }
-
-        @Override
-        public void run() {
-            try {
-                space.publishTask(task);
-                do {
-                    Result result = space.getResult(jobid);
-                    resultQ.put(result);
-                } while(true);
-            } catch (RemoteException e) {
-                System.out.println("Have assumed that a Space will never shutdown unexpectedly. Exiting.");
-                System.exit(0);
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private List<Space> spaces;
     private BlockingQueue<Result> resultQ;
    // private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
