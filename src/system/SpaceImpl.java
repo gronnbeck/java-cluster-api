@@ -16,18 +16,15 @@ import api.*;
 import checkpointing.Persistor;
 import checkpointing.Recoverable;
 import checkpointing.State;
-import tasks.FibResult;
 
 public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, Recoverable {
 
 	private static final long serialVersionUID = 1L;
     private String id;
-	private BlockingQueue<Result<?>> resultQue;
 	private BlockingQueue<Task<?>> taskQue;
 	private BlockingQueue<Task<?>> simpleTaskQue;
     private ConcurrentHashMap<Object,ContinuationTask> waitingTasks;
     private HashMap<String, BlockingQueue<Result>> resultQs;
-    private Shared<?> shared;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
 
     private ArrayList<Computer> computers;
@@ -41,10 +38,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     public SpaceImpl() throws RemoteException {
         super();
         id = UUID.randomUUID().toString();
-        resultQue = new LinkedBlockingQueue<Result<?>>();
         taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
-        resultQue = new LinkedBlockingQueue<Result<?>>();
         waitingTasks = new ConcurrentHashMap<Object, ContinuationTask>();
         resultQs = new HashMap<String, BlockingQueue<Result>>();
         sharedMap = new ConcurrentHashMap<String, Shared<?>>();
@@ -140,7 +135,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
-        if(this.shared != null) computer.setShared(this.shared);
+        for (Shared shared : sharedMap.values())
+            if(shared != null) computer.setShared(shared);
         computers.add(computer);
         // Start the ComputerProxy which steals task from other Spaces
         System.out.println("The space computer is successfully registred!");
@@ -156,8 +152,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             System.out.println("registering a cp");
             proxy = (ComputerProxy) computer;
         }
+        for (Shared shared : sharedMap.values())
+            if(shared != null) proxy.setShared(shared);
 
-        if(this.shared != null) proxy.setShared(this.shared);
         // TODO This is a bit hacky..
         for (Computer c : computers) {
             if (!(c instanceof SpaceComputer)) {
@@ -266,11 +263,11 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             reg.rebind(SERVICE_NAME, space);
             System.out.println("Space running!");
 
-            // Connect to SpaceProvider
+            // Connect to SpaceCoordinator
             Registry spaceProviderRegistry = LocateRegistry.getRegistry(host, 8887);
-            SpaceProvider spaceProvider = (SpaceProvider) spaceProviderRegistry.lookup(SpaceProvider.SERVICE_NAME);
+            SpaceCoordinator spaceProvider = (SpaceCoordinator) spaceProviderRegistry.lookup(SpaceCoordinator.SERVICE_NAME);
             spaceProvider.registerSpace(space);
-            System.out.println("Space connected to SpaceProvider at " + host);
+            System.out.println("Space connected to SpaceCoordinator at " + host);
 
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
@@ -297,6 +294,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 			for (Computer computer : computers) {
 				    computer.setShared(shared);
 			}
+            for (Space space : spaces.values()) {
+                space.setShared(shared);
+            }
 		}
 	}
     

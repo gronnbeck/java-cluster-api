@@ -14,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import api.Result;
-import api.SpaceProvider;
 import tasks.*;
 import api.Space;
 
@@ -50,11 +49,11 @@ public class Mandelbrot {
 	 public static void main(String[] args) throws Exception {
 		 
 		 if (args.length == 0) return;
-		 int port = 8887;
+		 int port = 8888;
 		 String url = args[0];
 		 Registry registry = LocateRegistry.getRegistry(url, port);
 
-		 SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
+         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 		 
 		 
 		 System.out.println("Starting mandelbrot!");
@@ -67,8 +66,9 @@ public class Mandelbrot {
 		 
 		 MandelTask MandelTask = new MandelTask(id,lowerX,lowerY,edge,n,iteration_limit);
 		 long jobExecTime = System.nanoTime();
-         Result res = space.publishTask(MandelTask);
-		 jobExecTime = System.nanoTime() - jobExecTime;
+         space.publishTask(MandelTask);
+         Result res = space.getResult(MandelTask.getJobId());
+         jobExecTime = System.nanoTime() - jobExecTime;
 		 count = (int[][])res.getTaskReturnValue();
 		 //End time - CLIENT
 		 

@@ -1,11 +1,9 @@
 package client;
 
 import api.*;
-import system.TaskListenerImpl;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
-import tasks.TspResult;
 import tasks.TspTask;
 
 import javax.swing.*;
@@ -77,7 +75,6 @@ public class Tsp {
         String url = args[0];
         Registry registry = LocateRegistry.getRegistry(url, port);
 
-        //SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
 

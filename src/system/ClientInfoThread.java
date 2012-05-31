@@ -2,14 +2,15 @@ package system;
 
 import java.rmi.RemoteException;
 
-import api.SpaceProvider;
+import api.Space;
+import api.SpaceCoordinator;
 
 public class ClientInfoThread implements Runnable{
 	
 	
-	SpaceProvider spaceProvider;
+	Space spaceProvider;
 	
-	public ClientInfoThread(SpaceProvider spaceProvider) {
+	public ClientInfoThread(Space spaceProvider) {
 		this.spaceProvider = spaceProvider;
 		
 		Thread thread = new Thread(this);
@@ -20,7 +21,7 @@ public class ClientInfoThread implements Runnable{
 		
 		String info = null;
 		try {
-			info = spaceProvider.getInfo();
+			info = spaceProvider.getInfo().toString();
 		} catch (RemoteException e) {
 			System.err.println("RemoteException: Could not get info");
 		}

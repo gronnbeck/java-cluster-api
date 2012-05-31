@@ -72,17 +72,6 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
 
         System.out.println("Started a SpaceWorkStealer to start stealing tasks from another space");
 
-        while (true) {
-            try {
-                Thread.sleep(5000);
-                System.out.println("tasksize for this proxy: " + getTaskQ().size());
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (RemoteException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-
     }
 
 }

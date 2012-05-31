@@ -147,8 +147,8 @@
         </java>
     </target>
 
-    <target name="runSpaceProvider" description="run client" >
-        <java classname="system.SpaceProviderImpl" fork="true">
+    <target name="runSpaceCoord" description="run client" >
+        <java classname="system.SpaceCoordinatorImpl" fork="true">
             <jvmarg value="-Djava.security.policy=policy"/>
             <arg value="localhost"/>
             <classpath>

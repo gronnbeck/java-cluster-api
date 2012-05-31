@@ -205,7 +205,6 @@ public class SpaceProxy implements Space, Executor, Runnable {
             }
         };
         put(runnable);
-
     }
 
 
