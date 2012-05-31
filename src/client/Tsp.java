@@ -1,8 +1,7 @@
 package client;
 
-import api.Result;
-import api.Space;
-import api.SpaceProvider;
+import api.*;
+import system.TaskListenerImpl;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
@@ -12,10 +11,37 @@ import tasks.TspTask;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.rmi.RemoteException;
 import java.rmi.registry.*;
 import java.util.ArrayList;
 
 public class Tsp {
+
+    private static class TaskEventReceiver extends Thread {
+
+        private Space space;
+        private String jobid;
+
+        TaskEventReceiver(Space space, String jobid) {
+            this.space = space;
+            this.jobid = jobid;
+        }
+
+        public void run () {
+            while (true) {
+                try {
+                    TaskEvent taskEvent = space.nextEvent(jobid);
+                    System.out.println("New optimal subpath found: "+taskEvent.getValue());
+                } catch (RemoteException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }
+
+    }
+
 
     private static Double findUpperBound(double[][] cities) {
         ArrayList<Integer> notVisited = new ArrayList<Integer>();
@@ -47,11 +73,12 @@ public class Tsp {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return;
 
-        int port = 8887;
+        int port = 8888;
         String url = args[0];
         Registry registry = LocateRegistry.getRegistry(url, port);
 
-        SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
+        //SpaceProvider space = (SpaceProvider) registry.lookup(SpaceProvider.SERVICE_NAME);
+        Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
 
 
@@ -83,8 +110,9 @@ public class Tsp {
 //                {6,4},
                 };
         
-        
-        TspTask tspTask = new TspTask(coord);
+
+        Task tspTask = new TspTask(coord);
+
         Double upperBound = findUpperBound(coord);
 
         space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
@@ -93,7 +121,13 @@ public class Tsp {
         long runTime = System.currentTimeMillis();
 
 
-        TspResult result = (TspResult) space.publishTask(tspTask);
+        space.publishTask(tspTask);
+
+        TaskEventReceiver taskEventReceiver = new TaskEventReceiver(space,tspTask.getJobId());
+        taskEventReceiver.start();
+
+        Result result = space.getResult(tspTask.getJobId());
+
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);

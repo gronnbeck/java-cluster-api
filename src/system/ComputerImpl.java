@@ -168,4 +168,9 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+        space.propagateTaskEvent(taskEvent);
+    }
+
 }

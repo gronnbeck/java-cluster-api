@@ -211,6 +211,11 @@ public class SpaceProxy implements Space, Executor, Runnable {
     }
 
     @Override
+    public TaskEvent nextEvent(String jobId) throws RemoteException, InterruptedException {
+        return space.nextEvent(jobId);
+    }
+
+    @Override
     public Result getResult(String jobId) throws RemoteException, InterruptedException {
         return space.getResult(jobId);
     }
@@ -242,5 +247,11 @@ public class SpaceProxy implements Space, Executor, Runnable {
             }
         }
 
+    }
+
+    @Override
+    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+        // TODO make async
+        space.propagateTaskEvent(taskEvent);
     }
 }

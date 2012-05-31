@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider, Computer {
+public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvider {
 
     private List<Space> spaces;
     private BlockingQueue<Result> resultQ;
@@ -81,11 +81,6 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
         }
     }
 
-    @Override
-    public Shared getShared(String id) throws RemoteException {
-        return shared;
-    }
-
 
     public static void main(String[] args) {
         int port = 8887;
@@ -103,66 +98,6 @@ public class SpaceProviderImpl extends UnicastRemoteObject implements SpaceProvi
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public Result<?> execute(Task<?> task) throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void stop() throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean hasCached() throws RemoteException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Result executeCachedTask() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void registerComputer(Computer cp) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void deregisterComputer(Computer cp) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public List<Computer> getComputers() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public List<Task> getTaskQ() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean canSteal() throws RemoteException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean want2Steal() throws RemoteException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Task stealTask() throws RemoteException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void addTask(Task task) throws RemoteException {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
 

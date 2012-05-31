@@ -259,4 +259,9 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
+    @Override
+    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+        // make async
+        computer.propagateTaskEvent(taskEvent);
+    }
 }

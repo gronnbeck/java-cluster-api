@@ -3,7 +3,7 @@ package api;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-public interface Task<T> extends Serializable {
+public interface Task<T> extends Serializable, TaskEventHandler {
     /**
      * Executes the given task
      * @return The tasks result
@@ -111,7 +111,6 @@ public interface Task<T> extends Serializable {
      * @return a result wrapped with the right job/task/owner ids
      */
     Result createResult(Result result);
-
 
 
 }

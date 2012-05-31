@@ -5,7 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface Computer extends Remote, Serializable {
+public interface Computer extends Remote, Serializable, TaskEventHandler {
     String SERVICE_NAME = "computer";
 
     /**
@@ -45,5 +45,6 @@ public interface Computer extends Remote, Serializable {
     public boolean want2Steal() throws RemoteException;
     public Task stealTask() throws  RemoteException;
     void addTask(Task task) throws RemoteException;
+
 
 }

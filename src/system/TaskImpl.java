@@ -2,6 +2,7 @@ package system;
 
 import api.*;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public abstract class TaskImpl implements Task {
@@ -54,6 +55,11 @@ public abstract class TaskImpl implements Task {
     @Override
     public String getOwnerId() { return this.ownerId; }
 
+    @Override
+    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+        computer.propagateTaskEvent(taskEvent);
+    }
+
 
     @Override
     public ContinuationResult createContinuationResult(ContinuationTask continuationTask) {
@@ -77,6 +83,11 @@ public abstract class TaskImpl implements Task {
         aResult.setJobId(getJobId());
         aResult.setOwnerId(getOwnerId());
         return aResult;
+    }
+
+
+    protected TaskEvent createTaskEvent(String type, Object value) {
+        return new TaskEventImpl(getOwnerId(), getJobId(), type, value);
     }
 
 }

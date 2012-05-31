@@ -164,10 +164,13 @@ public class TspTask extends TaskImpl implements Serializable  {
             double cost = TspHelpers.totalDistance(coordinates, newElement);
             try {
                 if (cost <= getSharedValue() && cost < currentlyBestCost) {
+
                     if (output.size() > 0)
                         output.remove(0);
+
                     output.add(newElement);
                     currentlyBestCost = cost;
+
                     setShared(new DoubleShared(cost, getJobId()));
                 }
             } catch (RemoteException e) {

@@ -9,6 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.*;
@@ -32,6 +33,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     private ArrayList<Computer> computers;
     private ConcurrentHashMap<String, Space> spaces;
 
+    private ConcurrentHashMap<String, BlockingQueue<TaskEvent>> taskEvents;
+
     // For checkpointing
     private boolean changed;
 
@@ -45,6 +48,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         waitingTasks = new ConcurrentHashMap<Object, ContinuationTask>();
         resultQs = new HashMap<String, BlockingQueue<Result>>();
         sharedMap = new ConcurrentHashMap<String, Shared<?>>();
+
+        taskEvents = new ConcurrentHashMap<String, BlockingQueue<TaskEvent>>();
 
         // Using an arraylist might give performance problems
         computers = new ArrayList<Computer>();
@@ -73,6 +78,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public void publishTask(Task task) throws RemoteException, InterruptedException {
         if (!resultQs.containsKey(task.getJobId())) resultQs.put(task.getJobId(), new LinkedBlockingQueue<Result>());
+        if (!taskEvents.contains(task.getJobId())) taskEvents.put(task.getJobId(), new LinkedBlockingDeque<TaskEvent>());
         task.setOwnerId(getId());
         put(task);
     }
@@ -100,6 +106,12 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public List<Computer> getComputers() throws RemoteException {
         return (List<Computer>) computers.clone();
+    }
+
+    @Override
+    public TaskEvent nextEvent(String jobId) throws RemoteException, InterruptedException {
+        BlockingQueue<TaskEvent> eventQ = taskEvents.get(jobId);
+        return eventQ.take();
     }
 
     @Override
@@ -376,5 +388,29 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             this.registerSpaceComputer(spaceComputer);
 
         } catch (RemoteException ignore) { }
+    }
+
+    @Override
+    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+        if (taskEvent.getOwnerId().equals(id)) {
+            BlockingQueue<TaskEvent> eventQ =  taskEvents.get(taskEvent.getJobId());
+
+            try {
+                eventQ.put(taskEvent);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+        else {
+            // return to task owner
+            Space space = spaces.get(taskEvent.getOwnerId());
+            try {
+                space.propagateTaskEvent(taskEvent);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
