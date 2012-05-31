@@ -192,7 +192,21 @@ public class SpaceProxy implements Space, Executor, Runnable {
         put(putResultTask);
     }
 
+    @Override
+    public void propagateTaskEvent(final TaskEvent taskEvent) throws RemoteException {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    space.propagateTaskEvent(taskEvent);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        put(runnable);
 
+    }
 
 
     // THESE ARE NOT ASYNC...
@@ -249,9 +263,4 @@ public class SpaceProxy implements Space, Executor, Runnable {
 
     }
 
-    @Override
-    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
-        // TODO make async
-        space.propagateTaskEvent(taskEvent);
-    }
 }
