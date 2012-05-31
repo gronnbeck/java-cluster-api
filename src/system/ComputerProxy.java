@@ -153,15 +153,16 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-    private void lookForCachedResult(Result result) {
+    private void lookForCachedTasks(Result result) {
         if (result instanceof ContinuationResult) {
-            // One should not be able to access the ContinuationTask in this way. Its error-prone.
-            // TODO find a better way to retrieve tasks marked as cached
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            ArrayList<Task> tasks = continuationTask.getTasks();
+            List<Task> cachedTask = continuationTask.getCachedTasks();
             Task task;
-            if ((task = tasks.get(0)).getCached() && this.cached == null) {
+            if ((task = cachedTask.get(0)).getCached() && this.cached == null) {
                 this.cached = task;
+            }
+            else if (this.cached != null) {
+                System.out.println("[ComputerProxy - lookForCachedTasks] This should not happen");
             }
         }
     }
@@ -239,7 +240,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
             } catch (RemoteException ignore){}
 
-            lookForCachedResult(result);
+            lookForCachedTasks(result);
             queueTasks(result);
             putResultToSpace(result);
         } while(running);

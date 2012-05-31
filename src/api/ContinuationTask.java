@@ -43,4 +43,10 @@ public interface ContinuationTask extends Task {
      */
     List<Task> markAsCached(int n);
 
+    /**
+     * Gets the Tasks of a Continuation task which is marked as cached
+     * @return a list of tasks that are marked as cached
+     */
+    List<Task> getCachedTasks();
+
 }

@@ -36,6 +36,15 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     }
 
     @Override
+    public List<Task> getCachedTasks(){
+        List<Task> cached = new ArrayList<Task>();
+        for (Task task : tasks) {
+            if (task.getCached()) cached.add(task);
+        }
+        return cached;
+    }
+
+    @Override
     public synchronized long getTaskRunTime() {
         long subRuntime = 0;
         for (Result result : results) {
