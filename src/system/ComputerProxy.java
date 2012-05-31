@@ -103,6 +103,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
 	@Override
 	public void setShared(Shared shared) throws RemoteException {
+        // TODO: Make A sync
 		computer.setShared(shared);
 		
 	}
@@ -128,8 +129,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    private void handleFaultyComputer(Task task)  {
-        // TODO add the process of handling prefetched tasks as well
+    private synchronized void handleFaultyComputer(Task task)  {
         giveTaskBack2Space(task);
         for (Task t : tasks) {
             giveTaskBack2Space(t);
@@ -191,7 +191,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             try {
                 boolean hasCached;
                 try {
-                    hasCached = hasCached();     // TODO we may not need this to be asynchronous.
+                    hasCached = hasCached();     // TODO we may not need this to be asynchronous. [DONE]
                 } catch (RemoteException e) {
                     System.out.println("A computer crashed on checking if it had a cached task");
                     if (cached != null) {

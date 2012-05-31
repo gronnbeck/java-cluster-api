@@ -38,10 +38,6 @@ public interface Computer extends Remote, Serializable {
 
     Result executeCachedTask() throws RemoteException;
 
-    // Dont know if we need this anymore?
-    Space getSpace() throws RemoteException;
-	void setSpace(Space space) throws RemoteException;
-
     public void registerComputer(Computer cp) throws RemoteException;
     public void deregisterComputer(Computer cp) throws RemoteException;
     public List<Computer> getComputers() throws RemoteException;
