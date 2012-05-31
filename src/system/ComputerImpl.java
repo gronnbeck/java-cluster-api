@@ -33,9 +33,8 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
         // TODO This part can be more elegant
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            ArrayList<Task> tasks = continuationTask.getTasks();
-            cached = tasks.get(0);
-            cached.setCached(true);
+            List<Task> cachedTasks = continuationTask.markAsCached(1);
+            cached = cachedTasks.get(0);
         }
         return result;
 	}

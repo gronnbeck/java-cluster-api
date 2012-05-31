@@ -1,6 +1,7 @@
 package api;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ContinuationTask extends Task {
     /**
@@ -33,5 +34,13 @@ public interface ContinuationTask extends Task {
      * @return The run time in ns as a long
      */
     long getTaskRunTime();
+
+
+    /**
+     * Mark 0 < i <= #tasks number of tasks as cached
+     * @param n the number of tasks that is cached
+     * @return a list of the tasks that are marked as cached will be returned
+     */
+    List<Task> markAsCached(int n);
 
 }

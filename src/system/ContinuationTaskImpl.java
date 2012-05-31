@@ -5,6 +5,7 @@ import api.Result;
 import api.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ContinuationTaskImpl extends TaskImpl implements ContinuationTask {
 
@@ -21,6 +22,17 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     @Override
     public synchronized void setTaskRunTime(long elapsedTime) {
         this.elapsedTime = elapsedTime;
+    }
+
+    @Override
+    public List<Task> markAsCached(int n) {
+        List<Task> cached = new ArrayList<Task>();
+        for (int i = 1; i <= n; i ++) {
+            Task task = tasks.get(i-1);
+            task.setCached(true);
+            cached.add(task);
+        }
+        return cached;
     }
 
     @Override
