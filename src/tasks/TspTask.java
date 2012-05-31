@@ -12,7 +12,7 @@ import system.TaskImpl;
 public class TspTask extends TaskImpl implements Serializable  {
 
 
-    // TODO: make thos configureable
+    // TODO: make thos configureable... Buggy...
     private static int levels = 2;
     private int tspBaseCase;
     private double[][] coordinates;
@@ -109,8 +109,6 @@ public class TspTask extends TaskImpl implements Serializable  {
      *         The path is represented as an integer array.
      */
     public Result execute() {
-      //  System.out.println(path.size());
-      //  System.out.println(lowerbound.getLowerBound() + " > " + getSharedValue());
         if (lowerbound.getLowerBound() > getSharedValue()) {
             PruneResult pr = new PruneResult(getTaskIdentifier(), getJobId());
             pr.setOwnerId(getOwnerId());
