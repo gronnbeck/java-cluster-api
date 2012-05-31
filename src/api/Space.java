@@ -73,6 +73,7 @@ public interface Space extends Remote, Computer2Space, Task2Space {
     public List<Computer> getComputers() throws RemoteException;
 
 
+    // TODO add javadoc comments
     Result getResult(String jobId) throws RemoteException, InterruptedException;
 
     

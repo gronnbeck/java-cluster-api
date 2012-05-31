@@ -49,6 +49,10 @@ public interface Result<T> extends Serializable {
      */
     String getJobId();
 
+    /**
+     * Advanced: Set a custom jobId for a result.
+     * @param jobId
+     */
     void setJobId(String jobId);
 
 

@@ -28,7 +28,14 @@ public interface Computer2Space extends Serializable, Remote {
      * @throws InterruptedException
      */
     Task<?> takeTask() throws RemoteException, InterruptedException;
-    
+
+    /**
+     * Takes a Simple task from Space.
+     * A Simple task is a task marked as simple by the developer and should be easy to execute (i.e. linear time algorithms)
+     * @return A task marked as simple, blocks if the taskQ is empty
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
     Task<?> takeSimpleTask() throws RemoteException, InterruptedException;
 
 }

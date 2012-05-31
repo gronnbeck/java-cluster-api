@@ -34,10 +34,9 @@ public interface Computer extends Remote, Serializable {
 	void setShared(Shared<?> shared) throws RemoteException;
 	
 
+    // TODO: Add java doc comments
     boolean hasCached() throws RemoteException;
-
     Result executeCachedTask() throws RemoteException;
-
     public void registerComputer(Computer cp) throws RemoteException;
     public void deregisterComputer(Computer cp) throws RemoteException;
     public List<Computer> getComputers() throws RemoteException;
