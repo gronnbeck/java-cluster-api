@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class Tsp {
 
+
     private static class TaskEventReceiver extends Thread {
 
         private Space space;
@@ -29,6 +30,15 @@ public class Tsp {
             while (true) {
                 try {
                     TaskEvent taskEvent = space.nextEvent(jobid);
+                    ArrayList<Integer> pathAsList = (ArrayList<Integer>) taskEvent.getValue();
+
+                    int[] path = new int[pathAsList.size()];
+                    for (int i = 0; i < path.length; i++)
+                        path[i] = pathAsList.get(i);
+
+                    JLabel euclideanTspLabel = displayEuclideanTspTaskReturnValue(coord, path);
+                    container.add( new JScrollPane( euclideanTspLabel ), BorderLayout.EAST );
+                    frame.pack();
                     System.out.println("New optimal subpath found: "+taskEvent.getValue());
                 } catch (RemoteException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -68,6 +78,35 @@ public class Tsp {
         return cost + TspHelpers.distance(cities[currentCity], cities[0]);
     }
 
+    static JFrame frame;
+    static Container container;
+    static double[][] coord =
+            {
+                    {1,1},
+                    {1,2},
+                    {1,3},
+                    {1,4},
+                    {2,1},
+                    {2,2},
+                    {2,3},
+                    {2,4},
+                    {3,1},
+                    {3,2},
+                    {3,3},
+                    {3,4},
+                    {4,1},
+                    {4,2}, //14
+                    {4,3},
+        		{4,4},
+        		{5,1},
+        		{5,2},
+//        		{5,3},
+//        		{5,4},
+//                {6,1},
+//                {6,2},
+//                {6,3},
+//                {6,4},
+            };
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return;
 
@@ -78,34 +117,16 @@ public class Tsp {
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
 
+        frame = new JFrame( "Result Visualizations" );
+        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+        container = frame.getContentPane();
+        container.setLayout( new BorderLayout() );
+        frame.pack();
+        frame.setVisible( true );
 
-        double[][] coord =
-                {
-        		{1,1},
-        		{1,2},
-        		{1,3},
-        		{1,4},
-        		{2,1},
-        		{2,2},
-        		{2,3},
-        		{2,4},
-        		{3,1},
-        		{3,2},
-        		{3,3},
-        		{3,4},
-        		{4,1},
-        		{4,2}, //14
-        		{4,3},
-        		{4,4},
-        		{5,1},
-        		{5,2},
-//        		{5,3},
-//        		{5,4},
-//                {6,1},
-//                {6,2},
-//                {6,3},
-//                {6,4},
-                };
+
+
+
         
 
         Task tspTask = new TspTask(coord);
@@ -135,13 +156,8 @@ public class Tsp {
             path[i] = pathAsList.get(i);
 
         JLabel euclideanTspLabel = displayEuclideanTspTaskReturnValue(coord, path);
-        JFrame frame = new JFrame( "Result Visualizations" );
-        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        Container container = frame.getContentPane();
-        container.setLayout( new BorderLayout() );
-        container.add( new JScrollPane( euclideanTspLabel ), BorderLayout.EAST );
+        container.add(new JScrollPane(euclideanTspLabel), BorderLayout.EAST);
         frame.pack();
-        frame.setVisible( true );
 
 
     }
@@ -176,13 +192,14 @@ public class Tsp {
 
         int margin = 10;
         int field = N_PIXELS - 2*margin;
+
         // draw edges
         graphics.setColor( Color.BLUE );
         int x1, y1, x2, y2;
         int city1 = tour[0], city2;
         x1 = margin + (int) ( scaledCities[city1][0]*field );
         y1 = margin + (int) ( scaledCities[city1][1]*field );
-        for ( int i = 1; i < cities.length; i++ )
+        for ( int i = 1; i < tour.length; i++ )
         {
             city2 = tour[i];
             x2 = margin + (int) ( scaledCities[city2][0]*field );
@@ -191,10 +208,13 @@ public class Tsp {
             x1 = x2;
             y1 = y2;
         }
+
         city2 = tour[0];
         x2 = margin + (int) ( scaledCities[city2][0]*field );
         y2 = margin + (int) ( scaledCities[city2][1]*field );
         graphics.drawLine( x1, y1, x2, y2 );
+
+
 
         // draw vertices
         int VERTEX_DIAMETER = 6;
