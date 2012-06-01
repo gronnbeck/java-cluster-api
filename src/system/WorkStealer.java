@@ -4,7 +4,6 @@ import api.Computer;
 import api.Task;
 
 import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Random;
 
 class WorkStealer implements Runnable {
@@ -25,7 +24,6 @@ class WorkStealer implements Runnable {
         this(computer);
         this.print = print;
     }
-
 
     private boolean hasComputers() throws RemoteException {
         return computer.getComputers().size() > 0;
@@ -69,15 +67,19 @@ class WorkStealer implements Runnable {
                 }
 
                 Computer computer = selectComputer();
-                if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQ().size() +") ");
+                if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQSize() +") ");
                 if (computer.canSteal()) {
                     Task task = null;
 
+                    while(computer.canSteal()) {
                     try {
-                        task = computer.stealTask();
-                    } catch (IndexOutOfBoundsException e) { }
-
-                    this.computer.addTask(task);
+                            task = computer.stealTask();
+                            if (task == null) break;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                        this.computer.addTask(task);
+                    }
                     resetBackOff();
 
                     if (print) System.out.println("Success");

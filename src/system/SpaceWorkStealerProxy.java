@@ -8,7 +8,6 @@ import java.util.List;
 
 public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
 
-    public int STEAL_ALLOWED_SIZE = 1;
     private Space thisSpace;
     private Space otherSpace;
 
@@ -21,8 +20,8 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
         super(new ComputerImpl(thisSpace), thisSpace);
         this.thisSpace = thisSpace;
         this.otherSpace = otherSpace;
-        super.STEAL_ALLOWED_SIZE = STEAL_ALLOWED_SIZE;
-        super.WANT_TO_STEAL_SIZE = 5;
+        this.LOW_WATERMARK = 0;
+        this.HIGH_WATERMARK = 0;
 
         thisSpace.register(this);
     }
@@ -35,12 +34,19 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
     @Override
     public void deregisterComputer(Computer cp) throws RemoteException {
         System.out.println("SpaceWorkStealerProxy doesn't use deregisterComputer");
-
     }
+
 
     @Override
     public List<Computer> getComputers() throws RemoteException {
-        return otherSpace.getComputers();
+        List<Computer> computers = null;
+        try {
+            computers = otherSpace.getComputers();
+        } catch (RemoteException e) {
+            System.out.println("Unhandled error");
+            System.exit(0);
+        }
+        return computers;
     }
 
     @Override
@@ -50,23 +56,12 @@ public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
     }
 
     @Override
-    public void addTask(Task task) {
-        try {
-            thisSpace.put(task);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
-
-    @Override
     public void run() {
         try {
             thisSpace.register(this);
         } catch (RemoteException ignore) { }
 
-        WorkStealer workStealer = new WorkStealer(this, true);
+        WorkStealer workStealer = new WorkStealer(this);
         Thread wsThread = new Thread(workStealer);
         wsThread.start();
 

@@ -11,11 +11,13 @@ public class SpaceState implements State {
 
     ArrayList<Shared<?>> shareds;
     ArrayList<ContinuationTask> continuationTasks;
+    String spaceid;
 
     public SpaceState(ArrayList<ContinuationTask> continuationTasks,
-                      ArrayList<Shared<?>> shareds) {
+                      ArrayList<Shared<?>> shareds, String spaceid) {
         this.continuationTasks = continuationTasks;
         this.shareds = shareds;
+        this.spaceid = spaceid;
     }
 
 }

@@ -144,7 +144,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
     @Override
-    public List<Task> getTaskQ() throws RemoteException {
+    public int getTaskQSize() throws RemoteException {
         throw new IllegalAccessError("Method not implemented in ComputerImpl");
     }
 

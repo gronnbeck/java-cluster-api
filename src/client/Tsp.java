@@ -27,19 +27,31 @@ public class Tsp {
         }
 
         public void run () {
+            //double bestCost = Double.MAX_VALUE;
             while (true) {
                 try {
                     TaskEvent taskEvent = space.nextEvent(jobid);
                     ArrayList<Integer> pathAsList = (ArrayList<Integer>) taskEvent.getValue();
+                    pathAsList.add(0,0);
 
+                   /*
+                    double currentCost = TspHelpers.totalDistance(coord, pathAsList);
+                    if (currentCost > bestCost) {
+                        continue;
+                    }
+                    bestCost = currentCost;
+                    */
                     int[] path = new int[pathAsList.size()];
                     for (int i = 0; i < path.length; i++)
                         path[i] = pathAsList.get(i);
 
+
+
                     JLabel euclideanTspLabel = displayEuclideanTspTaskReturnValue(coord, path);
+                    container.removeAll();
                     container.add( new JScrollPane( euclideanTspLabel ), BorderLayout.EAST );
                     frame.pack();
-                    System.out.println("New optimal subpath found: "+taskEvent.getValue());
+
                 } catch (RemoteException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (InterruptedException e) {
@@ -107,6 +119,8 @@ public class Tsp {
 //                {6,3},
 //                {6,4},
             };
+
+
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return;
 

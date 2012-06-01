@@ -171,6 +171,16 @@ public class TspTask extends TaskImpl implements Serializable  {
                     output.add(newElement);
                     currentlyBestCost = cost;
 
+                    try {
+                        ArrayList<Integer> subresult = new ArrayList<Integer>(newElement);
+                        for (int i = 0; i < path.size(); i++)
+                            subresult.add(i, path.get(i));
+
+                        propagateTaskEvent(createTaskEvent("new tsp result", subresult));
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
                     setShared(new DoubleShared(cost, getJobId()));
                 }
             } catch (RemoteException e) {

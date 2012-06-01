@@ -75,12 +75,6 @@ public class TspContin extends ContinuationTaskImpl {
 
         path.add(0, currentCity);
 
-        try {
-            propagateTaskEvent(createTaskEvent("new tsp result", path));
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
         return createResult(new TspResult(path, minCost));
 
     }

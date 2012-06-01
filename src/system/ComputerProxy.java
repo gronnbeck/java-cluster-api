@@ -5,18 +5,20 @@ import api.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
     // TODO One should be able to config these
-    public int WANT_TO_STEAL_SIZE = 2;
-    public int STEAL_ALLOWED_SIZE = 4;
-    private int TASK_LIST_MAX_SIZE = STEAL_ALLOWED_SIZE + 5;
+    public int HIGH_WATERMARK;
+    public int LOW_WATERMARK;
+    private int TASK_LIST_MAX_SIZE = HIGH_WATERMARK + 5;
 
     private Computer computer;
     protected Space space;
     private Task cached;
-    private ArrayList<Task> tasks;
+    private BlockingDeque<Task> tasks;
     private boolean running;
     private ArrayList<Computer> otherComputers;
 
@@ -31,9 +33,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.tasks = new ArrayList<Task>();    // FIX THESE TO BE THREADSAFE
+        this.tasks = new LinkedBlockingDeque<Task>();    // FIX THESE TO BE THREADSAFE
         this.running = true;
         this.otherComputers = new ArrayList<Computer>();
+        this.LOW_WATERMARK = 0;
+        this.HIGH_WATERMARK = 2;
 
         start();
     }
@@ -59,12 +63,16 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public synchronized boolean want2Steal() {
-        return tasks.size() <= WANT_TO_STEAL_SIZE;
+        return tasks.size() <= LOW_WATERMARK;
+    }
+
+    public synchronized boolean canSteal() {
+        return tasks.size() > HIGH_WATERMARK;
     }
 
     @Override
-    public synchronized Task stealTask() throws RemoteException {
-        return tasks.remove(0);
+    public synchronized Task stealTask() throws RemoteException, InterruptedException {
+        return tasks.pollLast();
     }
 
     @Override
@@ -72,13 +80,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.tasks.add(task);
     }
 
-    public synchronized boolean canSteal() {
-        return tasks.size() >= STEAL_ALLOWED_SIZE;
-    }
 
     @Override
-    public List<Task> getTaskQ() throws RemoteException {
-        return (List<Task>) tasks.clone();
+    public int getTaskQSize() throws RemoteException {
+        return tasks.size();
     }
 
     @Override
@@ -103,7 +108,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
 	@Override
 	public void setShared(Shared shared) throws RemoteException {
-        // TODO: Make A sync
 		computer.setShared(shared);
 		
 	}
@@ -215,14 +219,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         cached = null;
                     }
                 else {
-                    Task task;
-                    if (tasks.size() <= 0) {
-                        task = space.takeTask();
-                    }
-                    else {
-                        task = tasks.remove(0);
-                    }
-
+                    Task task = tasks.take();
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
@@ -238,7 +235,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             }
             catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
-            } catch (RemoteException ignore){}
+            }
 
             lookForCachedTasks(result);
             queueTasks(result);
@@ -250,7 +247,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         if (result instanceof ContinuationResult) {
             ContinuationResult cr = (ContinuationResult) result;
             for (Task task : cr.getTaskReturnValue().getTasks()) {
-                if (tasks.size() > TASK_LIST_MAX_SIZE) break;
+                // if (tasks.size() > TASK_LIST_MAX_SIZE) break;
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
                 tasks.add(task);

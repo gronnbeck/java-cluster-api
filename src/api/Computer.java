@@ -40,10 +40,10 @@ public interface Computer extends Remote, Serializable, TaskEventHandler {
     public void registerComputer(Computer cp) throws RemoteException;
     public void deregisterComputer(Computer cp) throws RemoteException;
     public List<Computer> getComputers() throws RemoteException;
-    public List<Task> getTaskQ() throws RemoteException;
+    public int getTaskQSize() throws RemoteException;
     public boolean canSteal() throws RemoteException;
     public boolean want2Steal() throws RemoteException;
-    public Task stealTask() throws  RemoteException;
+    public Task stealTask() throws RemoteException, InterruptedException;
     void addTask(Task task) throws RemoteException;
 
 
