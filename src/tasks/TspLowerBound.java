@@ -36,8 +36,7 @@ public class TspLowerBound implements Lowerbound<Double> {
 			notVisited.add(i);
 			
 		}
-		
-		Integer currentCity = -1;
+
 		double cost = totalDistance(coordinates, path);
 		
 		for (int i = 0; i < distance.length; i++) {
@@ -45,9 +44,9 @@ public class TspLowerBound implements Lowerbound<Double> {
 				distance[i][j] = TspHelpers.distance(coordinates[i],coordinates[j]);
 			}
 		}
-		
-		
-		currentCity = path.get(path.size() - 1);
+
+
+        Integer currentCity = path.get(path.size() - 1);
 		notVisited.remove(currentCity);
 		path.remove(currentCity);
 		for (Integer city : path) {
@@ -110,7 +109,7 @@ public class TspLowerBound implements Lowerbound<Double> {
         path.add(2);
         path.add(18);
         long time = System.currentTimeMillis();
-        TspLowerBound t = new TspLowerBound(coord, path);
+        TspNNLowerBound t = new TspNNLowerBound(coord, path);
         System.out.println(t.getLowerBound());
         System.out.println(System.currentTimeMillis() - time);
 

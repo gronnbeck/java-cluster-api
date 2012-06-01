@@ -16,14 +16,13 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
-        this.space = space;
+        this.space = new SpaceProxy(space);
         this.sharedMap = new ConcurrentHashMap<String, Shared<?>>();
 	}
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
 		long taskStartTime = System.nanoTime();
-		
         task.setComputer(this);
 
         Result result = task.execute();

@@ -13,12 +13,12 @@ public class DoubleShared extends SharedImpl {
 	@Override
 	public boolean isNewerThan(Shared shared) {
         if (shared == null) return true;
-        return val > (Double) shared.getValue();
+        return this.val < (Double) shared.getValue();
     }
 
     @Override
     public Double getValue() {
-        return val;
+        return this.val;
     }
 
 

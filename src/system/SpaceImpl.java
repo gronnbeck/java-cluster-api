@@ -185,7 +185,6 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
         // Bah comparing string is slow :/
         if (!result.getOwnerId().equals(getId())) {
-            System.out.println("got result for another space");
             Space proxy = spaces.get(result.getOwnerId());      // Assumes that Space in spaces is a spaceProxy
             proxy.putResult(result);
             return;
@@ -261,9 +260,8 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 	@Override
 	public  void setShared(Shared shared) throws RemoteException {
-        System.out.println("Trying to update shared");
 		if (checkAndSetSharedThreadSafe(shared)) {
-            System.out.println("Updating shared");
+            System.out.println("Updating shared " + shared.getValue());
 			for (Computer computer : computers) {
 				    computer.setShared(shared);
 			}

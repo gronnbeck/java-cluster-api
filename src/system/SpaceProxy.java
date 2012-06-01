@@ -155,10 +155,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
         put(deregisterComputerTask);
     }
 
-    @Override
-    public Task<?> takeSimpleTask() throws RemoteException, InterruptedException {
-        return space.takeSimpleTask();
-    }
+
 
     @Override
     public void registerContin(final ContinuationTask continuation) throws RemoteException {
@@ -216,6 +213,11 @@ public class SpaceProxy implements Space, Executor, Runnable {
         String id = space.getId();
         _id = id;
         return _id;
+    }
+
+    @Override
+    public Task<?> takeSimpleTask() throws RemoteException, InterruptedException {
+        return space.takeSimpleTask();
     }
 
     @Override

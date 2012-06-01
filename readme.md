@@ -10,7 +10,6 @@ Functional Requirements
 ### Speedups
 * Implementation of work stealing (Incl. high-low water marks), among computers proxies on the same space. Will start work stealing after initial prefetching phase. Uses Exponential backoff if a steal fails. 
 * Design and implementation of a space network. 
-* Prefetching of tasks, only used in the initial phase. 
 
 ### Support functionality
 * Accommodate concurrent jobs. 

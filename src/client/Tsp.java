@@ -27,25 +27,24 @@ public class Tsp {
         }
 
         public void run () {
-            //double bestCost = Double.MAX_VALUE;
+            double bestCost = Double.MAX_VALUE;
             while (true) {
                 try {
                     TaskEvent taskEvent = space.nextEvent(jobid);
                     ArrayList<Integer> pathAsList = (ArrayList<Integer>) taskEvent.getValue();
                     pathAsList.add(0,0);
 
-                   /*
+
                     double currentCost = TspHelpers.totalDistance(coord, pathAsList);
                     if (currentCost > bestCost) {
                         continue;
                     }
                     bestCost = currentCost;
-                    */
                     int[] path = new int[pathAsList.size()];
                     for (int i = 0; i < path.length; i++)
                         path[i] = pathAsList.get(i);
 
-
+                    System.out.println("new possibly optimal path: " + currentCost );
 
                     JLabel euclideanTspLabel = displayEuclideanTspTaskReturnValue(coord, path);
                     container.removeAll();
@@ -147,7 +146,7 @@ public class Tsp {
 
         Double upperBound = findUpperBound(coord);
 
-        space.setShared(new DoubleShared(upperBound+0.5, tspTask.getJobId()));
+        space.setShared(new DoubleShared(upperBound, tspTask.getJobId()));
 
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();

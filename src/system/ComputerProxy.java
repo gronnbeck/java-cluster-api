@@ -37,7 +37,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.running = true;
         this.otherComputers = new ArrayList<Computer>();
         this.LOW_WATERMARK = 0;
-        this.HIGH_WATERMARK = 2;
+        this.HIGH_WATERMARK = 10;
 
         start();
     }

@@ -48,7 +48,7 @@ public class TspTask extends TaskImpl implements Serializable  {
     public TspTask(double[][] coordinates) {
         this(coordinates, initCities(coordinates), 0, 0, initPath(0));
         this.tspBaseCase = coordinates.length - levels;
-        lowerbound = new TspLowerBound(coordinates, initPath(0)); // For now a pretty stupid lowerbound method
+        lowerbound = new TspNNLowerBound(coordinates, initPath(0)); // For now a pretty stupid lowerbound method
     }
 
 
@@ -63,7 +63,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         this.cost = cost;
         this.currentCity = currentCity;
         this.path.add(currentCity);
-        lowerbound = new TspLowerBound(coordinates, this.path); // For now a pretty stupid lowerbound method
+        lowerbound = new TspNNLowerBound(coordinates, this.path); // For now a pretty stupid lowerbound method
         simple = false;
     }
 
@@ -161,9 +161,15 @@ public class TspTask extends TaskImpl implements Serializable  {
         if(suffix.size() == 1) {
             ArrayList<Integer> newElement = new ArrayList<Integer>(prefix);
             newElement.addAll(suffix);
-            double cost = TspHelpers.totalDistance(coordinates, newElement);
+
+            ArrayList<Integer> potResult = new ArrayList<Integer>(newElement);
+            for (int i = 0; i < path.size(); i++)
+                potResult.add(i, path.get(i));
+
+            double cost = TspHelpers.totalDistance(coordinates, potResult);
+            double sharedCost = getSharedValue();
             try {
-                if (cost <= getSharedValue() && cost < currentlyBestCost) {
+                if (cost <= sharedCost && cost < currentlyBestCost) {
 
                     if (output.size() > 0)
                         output.remove(0);
@@ -172,16 +178,15 @@ public class TspTask extends TaskImpl implements Serializable  {
                     currentlyBestCost = cost;
 
                     try {
-                        ArrayList<Integer> subresult = new ArrayList<Integer>(newElement);
-                        for (int i = 0; i < path.size(); i++)
-                            subresult.add(i, path.get(i));
-
-                        propagateTaskEvent(createTaskEvent("new tsp result", subresult));
+                        propagateTaskEvent(createTaskEvent("new tsp result", potResult));
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
 
-                    setShared(new DoubleShared(cost, getJobId()));
+                    if (cost < sharedCost) {
+                        setShared(new DoubleShared(cost, getJobId()));
+                    }
+
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -204,7 +209,7 @@ public class TspTask extends TaskImpl implements Serializable  {
     }
 
     private double getLowerboundCost(double[][] coordinates, ArrayList<Integer> prefix) {
-        return new TspLowerBound(coordinates, prefix).getLowerBound();
+        return new TspNNLowerBound(coordinates, prefix).getLowerBound();
     }
 
 
