@@ -112,5 +112,17 @@ public interface Task<T> extends Serializable, TaskEventHandler {
      */
     Result createResult(Result result);
 
+    /**
+     * Set the priorty of a task. A task with higher priority will be executed first
+     * @param priority the priority level of a task, the higher the better
+     */
+    void setPriority(int priority);
+
+    /**
+     * Returns the priority of a Task
+     * @return the priority of a task as an int
+     */
+    int getPriority();
+
 
 }

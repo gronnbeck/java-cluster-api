@@ -12,6 +12,7 @@ public abstract class TaskImpl implements Task {
 	private Computer computer;
     private String ownerId;
 	private boolean isCached;
+    private int priority;
 
     public TaskImpl() {
         UUID uuid = UUID.randomUUID();
@@ -54,6 +55,12 @@ public abstract class TaskImpl implements Task {
 
     @Override
     public String getOwnerId() { return this.ownerId; }
+
+    @Override
+    public int getPriority()  { return this.priority; }
+
+    @Override
+    public void setPriority(int priority) { this.priority = priority; }
 
     @Override
     public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {

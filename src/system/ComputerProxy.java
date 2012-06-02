@@ -33,7 +33,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.tasks = new LinkedBlockingDeque<Task>();    // FIX THESE TO BE THREADSAFE
+        this.tasks = new PriorityBlockingDeque<Task>(TaskComparator.getSingleton(), Integer.MAX_VALUE);
         this.running = true;
         this.otherComputers = new ArrayList<Computer>();
         this.LOW_WATERMARK = 0;
