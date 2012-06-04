@@ -22,13 +22,13 @@
     <mkdir dir="${dist}"/>
 
     <!-- Make computer jar file -->
-    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/**"/>
+    <jar jarfile="${dist}/computer.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/** test/**"/>
     
     <!-- Make client jar file -->
-    <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/** checkpointing/**"/>
+    <jar jarfile="${dist}/client.jar" basedir="${build}" includes="client/** api/** tasks/** system/** checkpointing/** test/**"/>
   	
   	<!-- Make the space jar file -->
-  	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/**"/>
+  	<jar jarfile="${dist}/space.jar" basedir="${build}" includes="system/** api/** tasks/** checkpointing/** test/**"/>
 	</target>
   	<target name="javadoc" description="create javadocs">
   		<javadoc packagenames="tasks.*,api.*" sourcepath="${src}" destdir="documents/javadoc" />
@@ -139,6 +139,16 @@
 
     <target name="runFibClient" description="run client" >
         <java classname="client.Fib" fork="true">
+            <jvmarg value="-Djava.security.policy=policy"/>
+            <arg value="localhost"/>
+            <classpath>
+                <pathelement location="dist/client.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runTestClient" description="run client" >
+        <java classname="client.TestApplication" fork="true">
             <jvmarg value="-Djava.security.policy=policy"/>
             <arg value="localhost"/>
             <classpath>

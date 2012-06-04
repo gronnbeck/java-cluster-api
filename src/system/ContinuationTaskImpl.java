@@ -12,6 +12,7 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     private long elapsedTime;
     protected ArrayList<Result> results;
     protected ArrayList<Task> tasks;
+    protected boolean simple;
 
     public ContinuationTaskImpl(ArrayList<Task> tasks) {
         results = new ArrayList<Result>();
@@ -52,5 +53,10 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
         }
         return elapsedTime + subRuntime;
     }
+    
+	@Override
+	public boolean isSimple() {
+		return this.simple;
+	}
 
 }

@@ -137,13 +137,7 @@ public class Tsp {
         frame.pack();
         frame.setVisible( true );
 
-
-
-
-        
-
         Task tspTask = new TspTask(coord);
-
         Double upperBound = findUpperBound(coord);
 
         space.setShared(new DoubleShared(upperBound, tspTask.getJobId()));

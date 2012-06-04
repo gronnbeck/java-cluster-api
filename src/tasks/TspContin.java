@@ -14,7 +14,6 @@ public class TspContin extends ContinuationTaskImpl {
 
     private HashMap<String, Task> taskMap;
     private int currentCity;
-    private boolean simple;
 
 
 	public TspContin(int currentCity, ArrayList<Task> tasks) {
@@ -78,12 +77,5 @@ public class TspContin extends ContinuationTaskImpl {
         return createResult(new TspResult(path, minCost));
 
     }
-
-	@Override
-	public boolean isSimple() {
-		return this.simple;
-	}
-
-
 
 }

@@ -2,7 +2,6 @@ package system;
 
 import api.*;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public abstract class TaskImpl implements Task {
@@ -13,6 +12,7 @@ public abstract class TaskImpl implements Task {
     private String ownerId;
 	private boolean isCached;
     private int priority;
+    protected boolean simple;
 
     public TaskImpl() {
         UUID uuid = UUID.randomUUID();
@@ -96,5 +96,10 @@ public abstract class TaskImpl implements Task {
     protected TaskEvent createTaskEvent(String type, Object value) {
         return new TaskEventImpl(getOwnerId(), getJobId(), type, value);
     }
+    
+	@Override
+	public boolean isSimple() {
+		return this.simple;
+	}
 
 }
