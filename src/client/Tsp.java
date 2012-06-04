@@ -31,7 +31,7 @@ public class Tsp {
             while (true) {
                 try {
                     TaskEvent taskEvent = space.nextEvent(jobid);
-                    ArrayList<Integer> pathAsList = (ArrayList<Integer>) taskEvent.getValue();
+                    ArrayList<Integer> pathAsList = new ArrayList<Integer>((ArrayList<Integer>)taskEvent.getValue());
                     pathAsList.add(0,0);
 
 
@@ -52,9 +52,11 @@ public class Tsp {
                     frame.pack();
 
                 } catch (RemoteException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                   // e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                	System.exit(1);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                	System.exit(1);
                 }
             }
         }
@@ -129,6 +131,7 @@ public class Tsp {
 
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
+        
 
         frame = new JFrame( "Result Visualizations" );
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
@@ -141,6 +144,8 @@ public class Tsp {
         Double upperBound = findUpperBound(coord);
 
         space.setShared(new DoubleShared(upperBound, tspTask.getJobId()));
+        
+        Thread.sleep(1000); // Hack to fix setShared startup race condition
 
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();

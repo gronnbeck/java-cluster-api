@@ -27,7 +27,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     private HashMap<String, BlockingQueue<Result>> resultQs;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
 
-    private ArrayList<Computer> computers;
+    private BlockingQueue<Computer> computers;
     private ConcurrentHashMap<String, Space> spaces;
 
     private ConcurrentHashMap<String, BlockingQueue<TaskEvent>> taskEvents;
@@ -47,7 +47,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         taskEvents = new ConcurrentHashMap<String, BlockingQueue<TaskEvent>>();
 
         // Using an arraylist might give performance problems
-        computers = new ArrayList<Computer>();
+        computers = new LinkedBlockingQueue<Computer>();
 
         spaces = new ConcurrentHashMap<String, Space>();
 
@@ -69,9 +69,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 			return;
 		}
     	//taskQue.put(task);
-        Random random = new Random();
-        int randomInt = random.nextInt(computers.size()) % computers.size();
-        Computer computer = computers.get(randomInt);
+        Computer computer = computers.take();
         computer.addTask(task);
     }
 
@@ -105,7 +103,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
     @Override
     public List<Computer> getComputers() throws RemoteException {
-        return (List<Computer>) computers.clone();
+    	List<Computer> computer = new ArrayList<Computer>(computers);
+    	return computer;
+    	
     }
 
     @Override

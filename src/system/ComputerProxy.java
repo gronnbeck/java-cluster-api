@@ -6,7 +6,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
@@ -18,7 +20,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     private Computer computer;
     protected Space space;
     private Task cached;
-    private BlockingDeque<Task> tasks;
+    private BlockingQueue<Task> tasks;
     private boolean running;
     private ArrayList<Computer> otherComputers;
 
@@ -33,7 +35,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.tasks = new PriorityBlockingDeque<Task>(TaskComparator.getSingleton(), Integer.MAX_VALUE);
+        this.tasks = new PriorityBlockingQueue<Task>(11, TaskComparator.getSingleton());
         this.running = true;
         this.otherComputers = new ArrayList<Computer>();
         this.LOW_WATERMARK = 0;
@@ -72,7 +74,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public synchronized Task stealTask() throws RemoteException, InterruptedException {
-        return tasks.pollLast();
+        return tasks.poll();
     }
 
     @Override

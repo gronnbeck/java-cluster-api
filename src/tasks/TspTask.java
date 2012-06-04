@@ -95,6 +95,7 @@ public class TspTask extends TaskImpl implements Serializable  {
         DoubleShared shared = null;
         try {
             shared = (DoubleShared) getShared();
+//            System.out.println("done: "+ shared);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
