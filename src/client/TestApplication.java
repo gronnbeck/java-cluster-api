@@ -1,6 +1,5 @@
 package client;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -30,14 +29,7 @@ public class TestApplication {
 
 	        Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
-//	        frame = new JFrame("Testapplication");
-//	        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-//	        container = frame.getContentPane();
-//	        container.setLayout( new BorderLayout() );
-//	        frame.pack();
-//	        frame.setVisible( true );
-//	        
-	        TestTask task = new TestTask(1, 10);
+	        TestTask task = new TestTask(1, 100);
 	        System.out.println("Publishing task to space..");
 	        space.publishTask(task);
 	        

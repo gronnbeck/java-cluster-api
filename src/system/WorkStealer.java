@@ -61,20 +61,21 @@ class WorkStealer implements Runnable {
                     continue;
                 }
                 if (!computer.want2Steal()) {
-                    //System.out.println("Have enough tasks. Don't want 2 steal");
+//                    System.out.println("Have enough tasks. Don't want 2 steal");
                     updateBackoff();
                     continue;
                 }
 
                 Computer computer = selectComputer();
                 if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQSize() +") ");
-                if (computer.canSteal()) {
+                if (computer.canSteal() && this.computer.want2Steal()) {
                     Task task = null;
 
                     while(computer.canSteal()) {
+                    	System.out.println(computer.getTaskQSize());
                     try {
-                            task = computer.stealTask();
-                            if (task == null) break;
+                        task = computer.stealTask();
+                        if (task == null) break;
                     } catch (InterruptedException e) {
                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                     }
