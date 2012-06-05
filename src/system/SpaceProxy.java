@@ -2,7 +2,6 @@ package system;
 
 import api.*;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -233,11 +232,6 @@ public class SpaceProxy implements Space, Executor, Runnable {
     @Override
     public Result<?> getResult(String jobId) throws RemoteException, InterruptedException {
         return space.getResult(jobId);
-    }
-
-    @Override
-    public HashMap getInfo() throws RemoteException {
-        return space.getInfo();
     }
 
     @Override

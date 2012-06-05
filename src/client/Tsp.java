@@ -4,6 +4,7 @@ import api.*;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
+import tasks.TspResult;
 import tasks.TspTask;
 
 import javax.swing.*;
@@ -140,7 +141,7 @@ public class Tsp {
         frame.pack();
         frame.setVisible( true );
 
-        Task tspTask = new TspTask(coord);
+        TspTask tspTask = new TspTask(coord);
         Double upperBound = findUpperBound(coord);
 
         space.setShared(new DoubleShared(upperBound, tspTask.getJobId()));
@@ -156,7 +157,7 @@ public class Tsp {
         TaskEventReceiver taskEventReceiver = new TaskEventReceiver(space,tspTask.getJobId());
         taskEventReceiver.start();
 
-        Result result = space.getResult(tspTask.getJobId());
+        TspResult result = (TspResult)space.getResult(tspTask.getJobId());
 
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();

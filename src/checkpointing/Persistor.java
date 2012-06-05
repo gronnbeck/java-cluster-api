@@ -1,7 +1,6 @@
 package checkpointing;
 
 import java.io.*;
-import java.util.ArrayList;
 
 public class Persistor {
 

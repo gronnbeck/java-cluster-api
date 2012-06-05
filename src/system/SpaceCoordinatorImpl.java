@@ -25,9 +25,9 @@ public class SpaceCoordinatorImpl extends UnicastRemoteObject implements SpaceCo
     
     protected SpaceCoordinatorImpl() throws RemoteException {
         super();
-        spaces = new ArrayList<Space>();
-        resultQ = new LinkedBlockingQueue<Result<?>>();
-        startTime = System.nanoTime();
+        this.spaces = new ArrayList<Space>();
+        this.resultQ = new LinkedBlockingQueue<Result<?>>();
+        this.startTime = System.nanoTime();
     }
 
     @Override

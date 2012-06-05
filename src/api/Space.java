@@ -73,11 +73,13 @@ public interface Space extends Remote, Computer2Space, Task2Space, TaskEventHand
 
     TaskEvent<?> nextEvent(String jobId) throws RemoteException, InterruptedException;
 
-
-    // TODO add javadoc comments
+    /**
+     * Get the result from the job with a given id
+     * @param jobId
+     * @return
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
     Result<?> getResult(String jobId) throws RemoteException, InterruptedException;
-
-    
-    HashMap getInfo() throws RemoteException;
 
 }

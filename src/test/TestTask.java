@@ -34,7 +34,6 @@ public class TestTask extends TaskImpl implements Serializable{
 				subtasks.add(t);
 			}
 			
-			
 			return createContinuationResult(new TestContinuationTask(subtasks));
 		}
 		else {
@@ -46,7 +45,6 @@ public class TestTask extends TaskImpl implements Serializable{
 			for (int i = 0; i < 10.5E7; i++) {
 				counter++;
 			}
-			
 			
 			
 			return createResult(new TestResult());

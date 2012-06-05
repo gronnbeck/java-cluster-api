@@ -2,12 +2,9 @@ package system;
 
 import api.ContinuationTask;
 
-public class ContinuationResult extends ResultImpl {
+public class ContinuationResult extends ResultImpl<ContinuationTask> {
 
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 6093065798339632117L;
 	private ContinuationTask task;
 //    private long elapsedTime;
