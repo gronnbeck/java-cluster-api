@@ -68,10 +68,10 @@ class WorkStealer implements Runnable {
 
                 Computer computer = selectComputer();
                 if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQSize() +") ");
-                if (computer.canSteal() && this.computer.want2Steal()) {
+                if (computer.canSteal()) {
                     Task task = null;
 
-                    while(computer.canSteal()) {
+                    while(computer.canSteal() ) {
                     	System.out.println(computer.getTaskQSize());
                     try {
                         task = computer.stealTask();
