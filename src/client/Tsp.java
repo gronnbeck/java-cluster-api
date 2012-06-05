@@ -132,8 +132,6 @@ public class Tsp {
 
         Space space = (Space) registry.lookup(Space.SERVICE_NAME);
 
-        
-
         frame = new JFrame( "Result Visualizations" );
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         container = frame.getContentPane();

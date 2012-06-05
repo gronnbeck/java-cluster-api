@@ -76,7 +76,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
     @Override
-    public synchronized void addTask(Task<?> task) throws RemoteException {
+    public void addTask(Task<?> task) throws RemoteException {
         this.tasks.add(task);
     }
 
