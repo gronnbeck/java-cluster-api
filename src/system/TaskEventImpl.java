@@ -2,9 +2,10 @@ package system;
 
 import api.TaskEvent;
 
-public class TaskEventImpl implements TaskEvent {
+public class TaskEventImpl implements TaskEvent<Object> {
 
-    private String ownerId;
+	private static final long serialVersionUID = 6586230242298272950L;
+	private String ownerId;
     private String jobId;
     private String type;
     private Object value;

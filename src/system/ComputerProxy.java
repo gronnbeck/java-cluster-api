@@ -1,6 +1,7 @@
 package system;
 
 import api.*;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -13,7 +14,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 	// TODO One should be able to config these
     public int HIGH_WATERMARK;
     public int LOW_WATERMARK;
-//    private int TASK_LIST_MAX_SIZE = HIGH_WATERMARK + 5;
 
     private Computer computer;
     protected Space space;
@@ -56,28 +56,32 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public synchronized void deregisterComputer(Computer cp) throws RemoteException {
-        System.out.println("Computer disconnected");
         otherComputers.remove(cp);
 
     }
 
     @Override
-    public synchronized boolean want2Steal() {
+    public  boolean want2Steal() {
         return tasks.size() <= LOW_WATERMARK;
     }
 
-    public synchronized boolean canSteal() {
+    public  boolean canSteal() {
         return tasks.size() > HIGH_WATERMARK;
     }
 
     @Override
-    public synchronized Task<?> stealTask() throws RemoteException, InterruptedException {
+    public Task<?> stealTask() throws RemoteException, InterruptedException {
+        System.out.println("task has been stolen");
         return tasks.poll();
     }
 
     @Override
     public void addTask(Task<?> task) throws RemoteException {
-        this.tasks.add(task);
+        try {
+            this.tasks.put(task);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
 
@@ -133,12 +137,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    private synchronized void handleFaultyComputer(Task<?> task)  {
-        giveTaskBack2Space(task);
+    private void handleFaultyComputer(Task<?> task)  {
+        deregisterComputer();
+        if (task != null) giveTaskBack2Space(task);
         for (Task<?> t : tasks) {
             giveTaskBack2Space(t);
         }
-        deregisterComputer();
     }
 
     private void deregisterComputer() {
@@ -156,21 +160,6 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             e.printStackTrace();
         }
     }
-
-    private void lookForCachedTasks(Result<?> result) {
-        if (result instanceof ContinuationResult) {
-            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            List<Task<?>> cachedTask = continuationTask.getCachedTasks();
-            Task<?> task;
-            if ((task = cachedTask.get(0)).getCached() && this.cached == null) {
-                this.cached = task;
-            }
-            else if (this.cached != null) {
-                System.out.println("[ComputerProxy - lookForCachedTasks] This should not happen");
-            }
-        }
-    }
-
     /**
      * Start the ComputerProxy process
      * It waits on a client to publish a task. When a task is published
@@ -193,42 +182,41 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             Result<?> result = null;
             // if computer has a cached task execute that one. If not get one from space
             try {
-                boolean hasCached;
-                try {
-                    hasCached = hasCached();     // TODO we may not need this to be asynchronous. [DONE]
-                } catch (RemoteException e) {
-                    System.out.println("A computer crashed on checking if it had a cached task");
-                    if (cached != null) {
+                if (_hasCached()) {
+                    try {
+                        System.out.println("exec cached");
+                        result = computer.executeCachedTask();
+                        if (result == null) continue;   // the cached task has already been executed. This should never happen since
+                                                        // Computer should be single threaded (Intended design)
+                    } catch (RemoteException e) {
+                        System.out.println("TRYING");
+                        workStealer.stop();
+                        System.out.println("TRYING2");
                         handleFaultyComputer(cached);
+                        System.out.println("A computer has crashed. Putting the cached task back to space");
+                        return;
                     }
                     cached = null;
-                    running = false;
-                    return;
-                }
-                if (hasCached && cached != null) {
-                        try {
-                            result = computer.executeCachedTask();
-                            if (result == null) continue;   // the cached task has already been executed. This should never happen since
-                                                            // Computer should be single threaded (Intended design)
-                        } catch (RemoteException e) {
-                            System.out.println("A computer has crashed. Putting the cached task back to space");
-                            handleFaultyComputer(cached);
-                            running = false;
-                            return;
-                        }
-                        cached = null;
                     }
                 else {
                     Task<?> task = tasks.take();
+                    /* try {
+                        if (task == null) task = space.takeTask();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }  */
                     try {
+                        System.out.println("exec task");
                         result = execute(task);
                     } catch (RemoteException e) {
-                        System.out.println("A computer has crashed. Putting the currently running task back to space");
+                        System.out.println("TRYING");
+                        workStealer.stop();
+                        System.out.println("TRYING2");
                         if (cached != null) {
                             giveTaskBack2Space(cached);
                         }
                         handleFaultyComputer(task);
-                        running = false;
+                        System.out.println("A computer has crashed. Putting the currently running task back to space");
                         return;          // exit thread . The computer is no longer needed
                     }
                 }
@@ -240,8 +228,34 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
             lookForCachedTasks(result);
             queueTasks(result);
             putResultToSpace(result);
-        } while(running);
+
+        } while(true);
     }
+
+    private boolean _hasCached() {
+        boolean hasCached = false;
+        try {
+            hasCached = hasCached();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return hasCached;
+    }
+
+    private void lookForCachedTasks(Result<?> result) {
+        if (result instanceof ContinuationResult) {
+            ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
+            List<Task<?>> cachedTask = continuationTask.getCachedTasks();
+            Task<?> task;
+            if ((task = cachedTask.get(0)).getCached() && this.cached == null) {
+                this.cached = task;
+            }
+            else if (this.cached != null) {
+                System.out.println("[ComputerProxy - lookForCachedTasks] This should not happen");
+            }
+        }
+    }
+
 
     private void queueTasks(Result<?> result) {
         if (result instanceof ContinuationResult) {
@@ -250,7 +264,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                 // if (tasks.size() > TASK_LIST_MAX_SIZE) break;
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them
-                tasks.add(task);
+                try {
+                    tasks.put(task);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

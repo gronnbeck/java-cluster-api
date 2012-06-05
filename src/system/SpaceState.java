@@ -3,13 +3,12 @@ package system;
 import api.ContinuationTask;
 import api.Shared;
 import checkpointing.State;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SpaceState implements State {
 
-    ArrayList<Shared<?>> shareds;
+	private static final long serialVersionUID = -3064857360703568177L;
+	ArrayList<Shared<?>> shareds;
     ArrayList<ContinuationTask> continuationTasks;
     String spaceid;
 

@@ -5,19 +5,23 @@ import api.Task;
 
 import java.rmi.RemoteException;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 class WorkStealer implements Runnable {
 
     private int next;
-    private Computer computer;
+    private final Computer computer;
     private int backOff;
     private final int MAX_BACKOFF_VALUE = 2000;
     private boolean print;
+    private boolean running;
 
     public WorkStealer(Computer computer) {
         this.computer = computer;
         this.next = 0;
         this.backOff = 2;
+        this.running = true;
     }
 
     public WorkStealer(Computer computer, boolean print) {
@@ -48,6 +52,18 @@ class WorkStealer implements Runnable {
         backOff = 2;
     }
 
+    private BlockingQueue<Boolean> hasStopped;
+    public void stop() {
+        hasStopped = new LinkedBlockingQueue<Boolean>();
+        running = false;
+        try {
+            hasStopped.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        System.out.println("A Workstealer has been shutodwn");
+    }
+
     @Override
     public void run() {
         do {
@@ -60,26 +76,25 @@ class WorkStealer implements Runnable {
                     updateBackoff();
                     continue;
                 }
-                if (!computer.want2Steal()) {
-//                    System.out.println("Have enough tasks. Don't want 2 steal");
+                if (!this.computer.want2Steal()) {
                     updateBackoff();
                     continue;
                 }
 
                 Computer computer = selectComputer();
                 if (print) System.out.print("Trying to steal a task: ("+ computer.getTaskQSize() +") ");
-                if (computer.canSteal() && this.computer.want2Steal()) {
+                if (computer.canSteal()) {
                     Task<?> task = null;
 
-                    while(computer.canSteal()) {
+                    while(computer.canSteal() && running) {
                     	System.out.println(computer.getTaskQSize());
-                    try {
-                        task = computer.stealTask();
-                        if (task == null) break;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                        this.computer.addTask(task);
+                        try {
+                            task = computer.stealTask();
+                            if (task == null) break;
+                            this.computer.addTask(task);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
                     }
                     resetBackOff();
 
@@ -93,6 +108,14 @@ class WorkStealer implements Runnable {
 
             // TODO: Handle if a computer is faulty
 
-        } while (true);
+        } while (running);
+        System.out.println("out of while loop");
+
+        try {
+            hasStopped.put(true);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
     }
 }

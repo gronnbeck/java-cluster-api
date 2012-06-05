@@ -69,6 +69,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
                 try {
                     space.setShared(shared);
                 } catch (RemoteException e) {
+                    System.out.println("IT HAPPENS HERE");
                     e.printStackTrace();
                 }
             }

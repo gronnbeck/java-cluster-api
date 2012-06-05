@@ -126,6 +126,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 		if (checkAndSetSharedThreadSafe(proposedShared))	{
 			space.setShared( proposedShared );
 		}
+		
 	}
 
 	@Override
