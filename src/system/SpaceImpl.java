@@ -31,6 +31,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     private ConcurrentHashMap<String, Space> spaces;
 
     private ConcurrentHashMap<String, BlockingQueue<TaskEvent>> taskEvents;
+    private Computer spaceComputer;
 
     // For checkpointing
     private boolean changed;
@@ -67,10 +68,12 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         if (task.isSimple()) {
 			simpleTaskQue.put(task);
 			return;
-		}
-    	//taskQue.put(task);
+        }
+
+        //taskQue.put(task);
         Computer computer = computers.take();
         computer.addTask(task);
+        computers.put(computer);
     }
 
     @Override
@@ -133,23 +136,23 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 
     @Override
-    public synchronized void stop() throws RemoteException {
+    public void stop() throws RemoteException {
         for (Computer computer : computers) {
             computer.stop();
         }
+        spaceComputer.stop();
     }
 
-    private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
-        for (Shared shared : sharedMap.values())
-            if(shared != null) computer.setShared(shared);
-        computers.add(computer);
-        // Start the ComputerProxy which steals task from other Spaces
+    private void registerSpaceComputer(Computer computer) throws RemoteException{
+        for (Shared shared : sharedMap.values()) if(shared != null) computer.setShared(shared);
+        spaceComputer = computer;
+
         System.out.println("The space computer is successfully registered!");
 
     }
 
     @Override
-    public synchronized void register(Computer computer) throws RemoteException {
+    public void register(Computer computer) throws RemoteException {
         ComputerProxy proxy = null;
         if (!(computer instanceof ComputerProxy)) {
             proxy = new ComputerProxy(computer, this);
@@ -172,7 +175,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 
     @Override
-    public synchronized void deregister(Computer computer) throws RemoteException {
+    public void deregister(Computer computer) throws RemoteException {
         computers.remove(computer); // a cproxy here as well
         for (Computer c : computers) {
             c.deregisterComputer(computer);
@@ -233,13 +236,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
                 // Ignore cached tasks.
             	if (!task.getCached()) {
-            		taskQue.put(task);
+            		put(task);
 				}
 
-            	if (task.isSimple()){
-            		simpleTaskQue.put(task);
-            	}
-                
                 waitingTasks.put(task.getTaskIdentifier(), continuation);
 
 
@@ -260,6 +259,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
 
 	@Override
 	public  void setShared(Shared shared) throws RemoteException {
+        try {
 		if (checkAndSetSharedThreadSafe(shared)) {
             System.out.println("Updating shared " + shared.getValue());
 			for (Computer computer : computers) {
@@ -269,6 +269,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
                 space.setShared(shared);
             }
 		}
+        } catch (RemoteException e) {
+            System.out.println("Caught the remote exception here");
+        }
 	}
     
     public HashMap<String, String> getInfo() {

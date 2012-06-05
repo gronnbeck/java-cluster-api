@@ -150,13 +150,14 @@ public class Tsp {
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();
 
-
         space.publishTask(tspTask);
 
         TaskEventReceiver taskEventReceiver = new TaskEventReceiver(space,tspTask.getJobId());
         taskEventReceiver.start();
 
+
         Result result = space.getResult(tspTask.getJobId());
+
 
         System.out.println("Client run time: " + (System.currentTimeMillis() - runTime));
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
