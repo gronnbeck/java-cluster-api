@@ -2,8 +2,9 @@ package system;
 
 import api.Result;
 
-public abstract class ResultImpl implements Result{
+public abstract class ResultImpl<T> implements Result<T>{
 	
+	private static final long serialVersionUID = -6594480191375196257L;
 	protected long taskTime;
 	protected String id;
     private String jobId;

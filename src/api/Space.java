@@ -1,7 +1,5 @@
 package api;
 
-import system.SpaceWorkStealerProxy;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -40,7 +38,7 @@ public interface Space extends Remote, Computer2Space, Task2Space, TaskEventHand
      * @throws java.rmi.RemoteException
      * @throws java.lang.InterruptedException
      */
-    void publishTask(Task task) throws RemoteException, InterruptedException;
+    void publishTask(Task<?> task) throws RemoteException, InterruptedException;
 
     /**
      * Register to this that a space is available
@@ -73,11 +71,11 @@ public interface Space extends Remote, Computer2Space, Task2Space, TaskEventHand
     List<Computer> getComputers() throws RemoteException;
 
 
-    TaskEvent nextEvent(String jobId) throws RemoteException, InterruptedException;
+    TaskEvent<?> nextEvent(String jobId) throws RemoteException, InterruptedException;
 
 
     // TODO add javadoc comments
-    Result getResult(String jobId) throws RemoteException, InterruptedException;
+    Result<?> getResult(String jobId) throws RemoteException, InterruptedException;
 
     
     HashMap getInfo() throws RemoteException;

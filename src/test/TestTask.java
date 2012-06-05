@@ -21,7 +21,7 @@ public class TestTask extends TaskImpl implements Serializable{
 	@Override
 	public Result<?> execute() {
 		
-		ArrayList<Task> subtasks = new ArrayList<Task>();
+		ArrayList<Task<?>> subtasks = new ArrayList<Task<?>>();
 		System.out.println("Executing task with priority: " + this.getPriority());
 		
 		if (level > 0) {
@@ -39,12 +39,15 @@ public class TestTask extends TaskImpl implements Serializable{
 		}
 		else {
 			
+			@SuppressWarnings("unused")
 			int counter = 0;
 			
 			//Count to a million
 			for (int i = 0; i < 10.5E7; i++) {
 				counter++;
 			}
+			
+			
 			
 			return createResult(new TestResult());
 		}

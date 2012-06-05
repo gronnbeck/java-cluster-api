@@ -1,7 +1,6 @@
 package system;
 
 import api.*;
-
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpaceProxy implements Space, Executor, Runnable {
 
-    private BlockingQueue<Runnable> tasks;
+	private static final long serialVersionUID = 8009236881689702203L;
+	private BlockingQueue<Runnable> tasks;
     private Space space;
 
     public SpaceProxy (Space space) {
@@ -78,7 +78,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
     }
 
     @Override
-    public void publishTask(final Task task) throws RemoteException, InterruptedException {
+    public void publishTask(final Task<?> task) throws RemoteException, InterruptedException {
         Runnable publishTaskTask = new Runnable() {
             @Override
             public void run() {
@@ -173,7 +173,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
     }
 
     @Override
-    public void putResult(final Result result) throws RemoteException, InterruptedException {
+    public void putResult(final Result<?> result) throws RemoteException, InterruptedException {
         Runnable putResultTask = new Runnable() {
             @Override
             public void run() {
@@ -190,7 +190,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
     }
 
     @Override
-    public void propagateTaskEvent(final TaskEvent taskEvent) throws RemoteException {
+    public void propagateTaskEvent(final TaskEvent<?> taskEvent) throws RemoteException {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -226,12 +226,12 @@ public class SpaceProxy implements Space, Executor, Runnable {
     }
 
     @Override
-    public TaskEvent nextEvent(String jobId) throws RemoteException, InterruptedException {
+    public TaskEvent<?> nextEvent(String jobId) throws RemoteException, InterruptedException {
         return space.nextEvent(jobId);
     }
 
     @Override
-    public Result getResult(String jobId) throws RemoteException, InterruptedException {
+    public Result<?> getResult(String jobId) throws RemoteException, InterruptedException {
         return space.getResult(jobId);
     }
 

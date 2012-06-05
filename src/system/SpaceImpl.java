@@ -19,18 +19,18 @@ import checkpointing.State;
 
 public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, Recoverable {
 
-	private static final long serialVersionUID = 1L;
-    private String id;
+	private static final long serialVersionUID = 7347628591136195658L;
+	private String id;
 	private BlockingQueue<Task<?>> taskQue;
 	private BlockingQueue<Task<?>> simpleTaskQue;
     private ConcurrentHashMap<Object,ContinuationTask> waitingTasks;
-    private HashMap<String, BlockingQueue<Result>> resultQs;
+    private HashMap<String, BlockingQueue<Result<?>>> resultQs;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
 
     private BlockingQueue<Computer> computers;
     private ConcurrentHashMap<String, Space> spaces;
 
-    private ConcurrentHashMap<String, BlockingQueue<TaskEvent>> taskEvents;
+    private ConcurrentHashMap<String, BlockingQueue<TaskEvent<?>>> taskEvents;
 
     // For checkpointing
     private boolean changed;
@@ -41,10 +41,10 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         taskQue = new LinkedBlockingQueue<Task<?>>();
         simpleTaskQue = new LinkedBlockingQueue<Task<?>>();
         waitingTasks = new ConcurrentHashMap<Object, ContinuationTask>();
-        resultQs = new HashMap<String, BlockingQueue<Result>>();
+        resultQs = new HashMap<String, BlockingQueue<Result<?>>>();
         sharedMap = new ConcurrentHashMap<String, Shared<?>>();
 
-        taskEvents = new ConcurrentHashMap<String, BlockingQueue<TaskEvent>>();
+        taskEvents = new ConcurrentHashMap<String, BlockingQueue<TaskEvent<?>>>();
 
         // Using an arraylist might give performance problems
         computers = new LinkedBlockingQueue<Computer>();
@@ -74,9 +74,12 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     @Override
-    public void publishTask(Task task) throws RemoteException, InterruptedException {
-        if (!resultQs.containsKey(task.getJobId())) resultQs.put(task.getJobId(), new LinkedBlockingQueue<Result>());
-        if (!taskEvents.contains(task.getJobId())) taskEvents.put(task.getJobId(), new LinkedBlockingDeque<TaskEvent>());
+    public void publishTask(Task<?> task) throws RemoteException, InterruptedException {
+        if (!resultQs.containsKey(task.getJobId()))
+        	resultQs.put(task.getJobId(), new LinkedBlockingQueue<Result<?>>());
+        
+        if (!taskEvents.contains(task.getJobId()))
+        	taskEvents.put(task.getJobId(), new LinkedBlockingDeque<TaskEvent<?>>());
         task.setOwnerId(getId());
         put(task);
     }
@@ -85,7 +88,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     public void registerSpace(Space space) throws RemoteException {
         // TODO: Create a Space proxy to talk to instead
         Space proxy = new SpaceProxy(space);
-        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, proxy);
+//        Computer spaceWorkStealer = new SpaceWorkStealerProxy(this, proxy);
         spaces.put(proxy.getId(), proxy);
         System.out.println("A Space has registered itself");
     }
@@ -109,14 +112,14 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     @Override
-    public TaskEvent nextEvent(String jobId) throws RemoteException, InterruptedException {
-        BlockingQueue<TaskEvent> eventQ = taskEvents.get(jobId);
+    public TaskEvent<?> nextEvent(String jobId) throws RemoteException, InterruptedException {
+        BlockingQueue<TaskEvent<?>> eventQ = taskEvents.get(jobId);
         return eventQ.take();
     }
 
     @Override
-    public Result getResult(String jobId) throws RemoteException, InterruptedException {
-        BlockingQueue<Result> resultQ = resultQs.get(jobId);
+    public Result<?> getResult(String jobId) throws RemoteException, InterruptedException {
+        BlockingQueue<Result<?>> resultQ = resultQs.get(jobId);
         return resultQ.take();
     }
 
@@ -140,7 +143,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     private synchronized void registerSpaceComputer(Computer computer) throws RemoteException{
-        for (Shared shared : sharedMap.values())
+        for (Shared<?> shared : sharedMap.values())
             if(shared != null) computer.setShared(shared);
         computers.add(computer);
         // Start the ComputerProxy which steals task from other Spaces
@@ -157,7 +160,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             System.out.println("Registering a computer proxy");
             proxy = (ComputerProxy) computer;
         }
-        for (Shared shared : sharedMap.values())
+        for (Shared<?> shared : sharedMap.values())
             if(shared != null) proxy.setShared(shared);
 
         for (Computer c : computers) {
@@ -180,7 +183,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     @Override
-    public synchronized void putResult(Result result) throws RemoteException, InterruptedException {
+    public synchronized void putResult(Result<?> result) throws RemoteException, InterruptedException {
     	if (result == null) return;
 
         // Bah comparing string is slow :/
@@ -215,7 +218,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             // if not it is probably the end result (as I see it now)
             // in the case of fib. It should just be 1 number left
             if (resultQs.containsKey(result.getJobId())) {
-                BlockingQueue<Result> resultFetcher = resultQs.get(result.getJobId());
+                BlockingQueue<Result<?>> resultFetcher = resultQs.get(result.getJobId());
                 resultFetcher.put(result);
             } else {
                 System.out.println("Denne skal aldri bli kalt. Hvis den blir det, er det et delresultat som ikke skal komme hit" +
@@ -228,7 +231,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     @Override
     public synchronized void registerContin(ContinuationTask continuation) throws RemoteException {
         changed = true;
-        for (Task task : continuation.getTasks()) {
+        for (Task<?> task : continuation.getTasks()) {
             try {
 
                 // Ignore cached tasks.
@@ -249,7 +252,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         }
     }
 
-    private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
+    private synchronized boolean checkAndSetSharedThreadSafe(Shared<?> shared) throws RemoteException {
         Shared<?> thisShared = sharedMap.get(shared.getJobId());
         if (shared.isNewerThan(thisShared)) {
             sharedMap.put(shared.getJobId(), shared);
@@ -259,7 +262,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
 	@Override
-	public  void setShared(Shared shared) throws RemoteException {
+	public  void setShared(Shared<?> shared) throws RemoteException {
 		if (checkAndSetSharedThreadSafe(shared)) {
             System.out.println("Updating shared " + shared.getValue());
 			for (Computer computer : computers) {
@@ -299,7 +302,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         return changed;
     }
 
-    private void queueTask(Task task) {
+    private void queueTask(Task<?> task) {
         try {
             taskQue.put(task);
         } catch (InterruptedException e) {
@@ -333,7 +336,7 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
         System.out.println("  * Recovering Continuation Tasks");
         for (ContinuationTask continuationTask : state.continuationTasks) {
             System.out.println("  - Recovered: "+ continuationTask);
-            for (Task task : continuationTask.getTasks()) {
+            for (Task<?> task : continuationTask.getTasks()) {
                 waitingTasks.put(task.getTaskIdentifier(), continuationTask);
                 queueTask(task);
             }
@@ -363,9 +366,9 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
     }
 
     @Override
-    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+    public void propagateTaskEvent(TaskEvent<?> taskEvent) throws RemoteException {
         if (taskEvent.getOwnerId().equals(id)) {
-            BlockingQueue<TaskEvent> eventQ =  taskEvents.get(taskEvent.getJobId());
+            BlockingQueue<TaskEvent<?>> eventQ = taskEvents.get(taskEvent.getJobId());
 
             try {
                 eventQ.put(taskEvent);

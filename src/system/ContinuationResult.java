@@ -1,14 +1,16 @@
 package system;
 
-
 import api.ContinuationTask;
-import api.Result;
 
 public class ContinuationResult extends ResultImpl {
 
 
-    private ContinuationTask task;
-    private long elapsedTime;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6093065798339632117L;
+	private ContinuationTask task;
+//    private long elapsedTime;
 
     protected ContinuationResult(ContinuationTask task) {
         this.task = task;

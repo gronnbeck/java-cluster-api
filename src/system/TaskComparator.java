@@ -5,12 +5,11 @@ import api.Task;
 
 public class TaskComparator implements Comparator<Task<?>>{
 
-    // SINGLETON!
     private TaskComparator() { }
 
     private static TaskComparator tc;
 
-    public static Comparator getSingleton() {
+    public static Comparator<Task<?>> getSingleton() {
         return tc == null ? tc = new TaskComparator() : tc;
     }
 

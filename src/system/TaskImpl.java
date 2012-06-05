@@ -4,9 +4,10 @@ import api.*;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
-public abstract class TaskImpl implements Task {
+public abstract class TaskImpl<T> implements Task<T> {
 
-    private String taskId;
+	private static final long serialVersionUID = -5348782575433953117L;
+	private String taskId;
     private String jobId;
 	private Computer computer;
     private String ownerId;
@@ -36,10 +37,10 @@ public abstract class TaskImpl implements Task {
 	abstract public Result<?> execute();
 
     @Override
- 	public Shared getShared() throws RemoteException { return computer.getShared(jobId); }
+ 	public Shared<?> getShared() throws RemoteException { return computer.getShared(jobId); }
 
     @Override
-	public void setShared(Shared shared) throws RemoteException { computer.setShared(shared); }
+	public void setShared(Shared<?> shared) throws RemoteException { computer.setShared(shared); }
 
     @Override
     public  void  setComputer( Computer computer ) { this.computer = computer; }
@@ -63,7 +64,7 @@ public abstract class TaskImpl implements Task {
     public void setPriority(int priority) { this.priority = priority; }
 
     @Override
-    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+    public void propagateTaskEvent(TaskEvent<?> taskEvent) throws RemoteException {
         computer.propagateTaskEvent(taskEvent);
     }
 
@@ -73,7 +74,7 @@ public abstract class TaskImpl implements Task {
         continuationTask.setTaskIdentifier(getTaskIdentifier());
         continuationTask.setJobId(getJobId());
         continuationTask.setOwnerId(getOwnerId());
-        for (Task task : continuationTask.getTasks()) {
+        for (Task<?> task : continuationTask.getTasks()) {
             task.setJobId(this.jobId);
             task.setOwnerId(getOwnerId());
         }
@@ -85,7 +86,7 @@ public abstract class TaskImpl implements Task {
     }
 
     @Override
-    public Result createResult(Result aResult) {
+    public Result<?> createResult(Result<?> aResult) {
         aResult.setTaskIdentifier(getTaskIdentifier());
         aResult.setJobId(getJobId());
         aResult.setOwnerId(getOwnerId());
@@ -93,7 +94,7 @@ public abstract class TaskImpl implements Task {
     }
 
 
-    protected TaskEvent createTaskEvent(String type, Object value) {
+    protected TaskEvent<?> createTaskEvent(String type, Object value) {
         return new TaskEventImpl(getOwnerId(), getJobId(), type, value);
     }
     

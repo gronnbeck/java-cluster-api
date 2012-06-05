@@ -10,6 +10,7 @@ import api.Task;
 
 public class MandelTask extends TaskImpl implements Serializable{
 	
+	private static final long serialVersionUID = -4641725174206740800L;
 	private double lowerX;
 	private double lowerY;
 	private double edge;
@@ -77,17 +78,16 @@ public class MandelTask extends TaskImpl implements Serializable{
 		double newEdge = edge/2;
 		
 		
-		ArrayList<Task> tasks = new ArrayList<Task>();
+		ArrayList<Task<?>> tasks = new ArrayList<Task<?>>();
 		String id1 = id.concat(".0");
-		Task sub1 = new MandelTask(id1, lowerX, lowerY, newEdge,newN, iteration_limit);
+		MandelTask sub1 = new MandelTask(id1, lowerX, lowerY, newEdge,newN, iteration_limit);
 		String id2 = id.concat(".1");
-		Task sub2 = new MandelTask(id2, lowerX+newEdge, lowerY, newEdge, newN, iteration_limit);
+		MandelTask sub2 = new MandelTask(id2, lowerX+newEdge, lowerY, newEdge, newN, iteration_limit);
 		String id3 = id.concat(".2");
-		Task sub3 = new MandelTask(id3, lowerX, lowerY+newEdge, newEdge, newN, iteration_limit);
+		MandelTask sub3 = new MandelTask(id3, lowerX, lowerY+newEdge, newEdge, newN, iteration_limit);
 		String id4 = id.concat(".3");
-		Task sub4 = new MandelTask(id4, lowerX+newEdge, lowerY+newEdge, newEdge, newN, iteration_limit);
+		MandelTask sub4 = new MandelTask(id4, lowerX+newEdge, lowerY+newEdge, newEdge, newN, iteration_limit);
 		tasks.add(sub1);tasks.add(sub2);tasks.add(sub3);tasks.add(sub4);
-
 		
 		return createContinuationResult(new MandelContin(tasks));
 	}

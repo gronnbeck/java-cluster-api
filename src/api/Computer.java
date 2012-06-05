@@ -24,7 +24,7 @@ public interface Computer extends Remote, Serializable, TaskEventHandler {
      * Returns the shared object for this type of task.
      * @return
      */
-    Shared getShared(String id) throws RemoteException;
+    Shared<?> getShared(String id) throws RemoteException;
 	
 	/**
 	 * Sets the shared object of this computer.
@@ -36,15 +36,15 @@ public interface Computer extends Remote, Serializable, TaskEventHandler {
 
     // TODO: Add java doc comments
     boolean hasCached() throws RemoteException;
-    Result executeCachedTask() throws RemoteException;
+    Result<?> executeCachedTask() throws RemoteException;
     public void registerComputer(Computer cp) throws RemoteException;
     public void deregisterComputer(Computer cp) throws RemoteException;
     public List<Computer> getComputers() throws RemoteException;
     public int getTaskQSize() throws RemoteException;
     public boolean canSteal() throws RemoteException;
     public boolean want2Steal() throws RemoteException;
-    public Task stealTask() throws RemoteException, InterruptedException;
-    void addTask(Task task) throws RemoteException;
+    public Task<?> stealTask() throws RemoteException, InterruptedException;
+    void addTask(Task<?> task) throws RemoteException;
 
 
 }

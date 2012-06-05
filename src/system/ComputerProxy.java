@@ -1,26 +1,24 @@
 package system;
 
 import api.*;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class ComputerProxy extends UnicastRemoteObject implements Runnable, Computer {
 
-    // TODO One should be able to config these
+	private static final long serialVersionUID = -8341261141794701967L;
+	// TODO One should be able to config these
     public int HIGH_WATERMARK;
     public int LOW_WATERMARK;
-    private int TASK_LIST_MAX_SIZE = HIGH_WATERMARK + 5;
+//    private int TASK_LIST_MAX_SIZE = HIGH_WATERMARK + 5;
 
     private Computer computer;
     protected Space space;
-    private Task cached;
-    private BlockingQueue<Task> tasks;
+    private Task<?> cached;
+    private BlockingQueue<Task<?>> tasks;
     private boolean running;
     private ArrayList<Computer> otherComputers;
 
@@ -35,7 +33,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         this.computer = computer;
         this.space = space;
         this.cached = null;
-        this.tasks = new PriorityBlockingQueue<Task>(11, TaskComparator.getSingleton());
+        this.tasks = new PriorityBlockingQueue<Task<?>>(11, TaskComparator.getSingleton());
         this.running = true;
         this.otherComputers = new ArrayList<Computer>();
         this.LOW_WATERMARK = 0;
@@ -73,12 +71,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
     @Override
-    public synchronized Task stealTask() throws RemoteException, InterruptedException {
+    public synchronized Task<?> stealTask() throws RemoteException, InterruptedException {
         return tasks.poll();
     }
 
     @Override
-    public synchronized void addTask(Task task) throws RemoteException {
+    public synchronized void addTask(Task<?> task) throws RemoteException {
         this.tasks.add(task);
     }
 
@@ -90,11 +88,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
     @Override
     public List<Computer> getComputers() throws RemoteException {
-        return (List<Computer>) otherComputers.clone();
+    	return new ArrayList<Computer>(otherComputers);
     }
 
     @Override
-    public Result execute(Task task) throws RemoteException {
+    public Result<?> execute(Task<?> task) throws RemoteException {
         return computer.execute(task);
     }
 
@@ -104,12 +102,12 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 	@Override
-	public Shared getShared(String jobId) throws RemoteException {
+	public Shared<?> getShared(String jobId) throws RemoteException {
 		return computer.getShared(jobId);
 	}
 
 	@Override
-	public void setShared(Shared shared) throws RemoteException {
+	public void setShared(Shared<?> shared) throws RemoteException {
 		computer.setShared(shared);
 		
 	}
@@ -120,11 +118,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
     @Override
-    public Result executeCachedTask() throws RemoteException {
+    public Result<?> executeCachedTask() throws RemoteException {
         return computer.executeCachedTask();
     }
 
-    private void giveTaskBack2Space(Task task) {
+    private void giveTaskBack2Space(Task<?> task) {
         try {
             task.setCached(false);
             space.put(task);
@@ -135,9 +133,9 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
     }
 
 
-    private synchronized void handleFaultyComputer(Task task)  {
+    private synchronized void handleFaultyComputer(Task<?> task)  {
         giveTaskBack2Space(task);
-        for (Task t : tasks) {
+        for (Task<?> t : tasks) {
             giveTaskBack2Space(t);
         }
         deregisterComputer();
@@ -149,7 +147,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         } catch (RemoteException ignore) { }
     }
 
-    private void putResultToSpace(Result result) {
+    private void putResultToSpace(Result<?> result) {
         try {
             space.putResult(result);
         }
@@ -159,11 +157,11 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-    private void lookForCachedTasks(Result result) {
+    private void lookForCachedTasks(Result<?> result) {
         if (result instanceof ContinuationResult) {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
-            List<Task> cachedTask = continuationTask.getCachedTasks();
-            Task task;
+            List<Task<?>> cachedTask = continuationTask.getCachedTasks();
+            Task<?> task;
             if ((task = cachedTask.get(0)).getCached() && this.cached == null) {
                 this.cached = task;
             }
@@ -192,7 +190,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
 
 
         do {
-            Result result = null;
+            Result<?> result = null;
             // if computer has a cached task execute that one. If not get one from space
             try {
                 boolean hasCached;
@@ -221,7 +219,7 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
                         cached = null;
                     }
                 else {
-                    Task task = tasks.take();
+                    Task<?> task = tasks.take();
                     try {
                         result = execute(task);
                     } catch (RemoteException e) {
@@ -245,10 +243,10 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         } while(running);
     }
 
-    private void queueTasks(Result result) {
+    private void queueTasks(Result<?> result) {
         if (result instanceof ContinuationResult) {
             ContinuationResult cr = (ContinuationResult) result;
-            for (Task task : cr.getTaskReturnValue().getTasks()) {
+            for (Task<?> task : cr.getTaskReturnValue().getTasks()) {
                 // if (tasks.size() > TASK_LIST_MAX_SIZE) break;
                 if (task.getCached()) continue;
                 task.setCached(true);                             // mark as cached so Space does not Q them

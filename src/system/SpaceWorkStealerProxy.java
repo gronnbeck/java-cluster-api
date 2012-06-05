@@ -8,7 +8,8 @@ import java.util.List;
 
 public class SpaceWorkStealerProxy extends ComputerProxy implements Runnable {
 
-    private Space thisSpace;
+	private static final long serialVersionUID = 8616855479558607248L;
+	private Space thisSpace;
     private Space otherSpace;
 
     /**

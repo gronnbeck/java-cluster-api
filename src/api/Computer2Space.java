@@ -3,7 +3,6 @@ package api;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 
 public interface Computer2Space extends Serializable, Remote {
 

@@ -10,9 +10,10 @@ import api.*;
 
 public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 
-    private Space space;
+	private static final long serialVersionUID = 7766125330258198521L;
+	private Space space;
     private ConcurrentHashMap<String, Shared<?>> sharedMap;
-    private Task cached;
+    private Task<?> cached;
 
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
@@ -25,7 +26,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 		long taskStartTime = System.nanoTime();
         task.setComputer(this);
 
-        Result result = task.execute();
+        Result<?> result = task.execute();
         result.setTaskRunTime(taskStartTime);
         
         // TODO This part can be more elegant
@@ -33,7 +34,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
             ContinuationTask continuationTask = (ContinuationTask) result.getTaskReturnValue();
             
             Collections.sort(continuationTask.getTasks(), TaskComparator.getSingleton());            
-            List<Task> cachedTasks = continuationTask.markAsCached(1);
+            List<Task<?>> cachedTasks = continuationTask.markAsCached(1);
             cached = cachedTasks.get(0);
         }
         return result;
@@ -45,11 +46,11 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
     @Override
-    public  Result executeCachedTask() throws RemoteException {
+    public  Result<?> executeCachedTask() throws RemoteException {
 //        System.out.println("Running a cached task");
         // hate too return _null_. Fix later
         if (cached == null) return null;
-        Task task = cached;
+        Task<?> task = cached;
         cached = null;
         return execute(task);
     }
@@ -107,12 +108,12 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	}
 
 	@Override
-	public synchronized Shared getShared(String id) throws RemoteException {
+	public synchronized Shared<?> getShared(String id) throws RemoteException {
         return sharedMap.get(id);
 	}
 
 
-    private synchronized boolean checkAndSetSharedThreadSafe(Shared shared) throws RemoteException {
+    private synchronized boolean checkAndSetSharedThreadSafe(Shared<?> shared) throws RemoteException {
         Shared<?> thisShared = sharedMap.get(shared.getJobId());
         if (shared.isNewerThan(thisShared)) {
             sharedMap.put(shared.getJobId(), shared);
@@ -122,7 +123,7 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
 	@Override
-	public void setShared(Shared proposedShared) throws RemoteException {
+	public void setShared(Shared<?> proposedShared) throws RemoteException {
 		if (checkAndSetSharedThreadSafe(proposedShared))	{
             space.setShared( proposedShared );
 		}
@@ -160,17 +161,17 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
     }
 
     @Override
-    public Task stealTask() throws RemoteException {
+    public Task<?> stealTask() throws RemoteException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public synchronized void addTask(Task task) throws RemoteException {
+    public synchronized void addTask(Task<?> task) throws RemoteException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void propagateTaskEvent(TaskEvent taskEvent) throws RemoteException {
+    public void propagateTaskEvent(TaskEvent<?> taskEvent) throws RemoteException {
         space.propagateTaskEvent(taskEvent);
     }
 

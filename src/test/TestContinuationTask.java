@@ -2,31 +2,30 @@ package test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import api.Result;
 import api.Task;
 import system.ContinuationTaskImpl;
-import system.PruneResult;
 
 public class TestContinuationTask extends ContinuationTaskImpl{
 
-	private ArrayList<Task> tasks;
-    private HashMap<String, Task> taskMap;
+	private static final long serialVersionUID = -5717242449631546818L;
+	private ArrayList<Task<?>> tasks;
+    private HashMap<String, Task<?>> taskMap;
 
 	
-	public TestContinuationTask(ArrayList<Task> tasks) {
+	public TestContinuationTask(ArrayList<Task<?>> tasks) {
 		super(tasks);
 		this.tasks = tasks;
-		taskMap = new HashMap<String, Task>();
+		taskMap = new HashMap<String, Task<?>>();
 		
-        for (Task t : tasks) {
+        for (Task<?> t : tasks) {
             taskMap.put(t.getTaskIdentifier(), t);
         }
         simple = true;
 	}
 
 	@Override
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task<?>> getTasks() {
 		return this.tasks;
 	}
 

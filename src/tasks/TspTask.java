@@ -12,7 +12,9 @@ import system.TaskImpl;
 public class TspTask extends TaskImpl implements Serializable  {
 
 
-    // TODO: make thos configureable... Buggy...
+	private static final long serialVersionUID = -3732706190242542809L;
+	
+	// TODO: make thos configureable... Buggy...
     private static int levels = 2;
     private int tspBaseCase;
     private double[][] coordinates;
@@ -135,7 +137,7 @@ public class TspTask extends TaskImpl implements Serializable  {
              return createResult(new TspResult(minPath, minCost));
          }
 
-        ArrayList<Task> subtasks = new ArrayList<Task>();
+        ArrayList<Task<?>> subtasks = new ArrayList<Task<?>>();
         for (Integer city : cities) {
             double newCost = TspHelpers.distance(coordinates[city], coordinates[currentCity]) + cost;
             ArrayList<Integer> citiesNotVisited = (ArrayList<Integer>) cities.clone();

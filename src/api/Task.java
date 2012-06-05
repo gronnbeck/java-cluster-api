@@ -86,7 +86,7 @@ public interface Task<T> extends Serializable, TaskEventHandler {
      * Returns the shared object for this type of task.
      * @return
      */
-    Shared getShared() throws RemoteException;
+    Shared<?> getShared() throws RemoteException;
 
     /**
      * Sets the shared object of this task.
@@ -102,7 +102,7 @@ public interface Task<T> extends Serializable, TaskEventHandler {
      * @param continuationTask The task which should be past as a new tak
      * @return A ContinuationResult containing the corresponding continuation task.
      */
-    Result createContinuationResult(ContinuationTask continuationTask);
+    Result<?> createContinuationResult(ContinuationTask continuationTask);
 
     /**
      * Every result from a task should be passed through this filter. This filter adds the needed
@@ -110,7 +110,7 @@ public interface Task<T> extends Serializable, TaskEventHandler {
      * @param result A result that a task wants to return
      * @return a result wrapped with the right job/task/owner ids
      */
-    Result createResult(Result result);
+    Result<?> createResult(Result<?> result);
 
     /**
      * Set the priorty of a task. A task with higher priority will be executed first

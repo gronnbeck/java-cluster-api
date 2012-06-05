@@ -12,8 +12,8 @@ import api.Task2Space;
 
 public class MandelContin extends ContinuationTaskImpl {
 	
-	private ArrayList<Task> tasks;
-	private ArrayList<Result> results;
+	private ArrayList<Task<?>> tasks;
+	private ArrayList<Result<MandelResult>> results;
 	private int counter;
 	private int[][] count;
 	private long runTime;
@@ -23,14 +23,14 @@ public class MandelContin extends ContinuationTaskImpl {
     /**
      * The task that should be executed after all the subtasks of a MandelBrot Set task
      * has completed.
-     * @param tasks the tasks that needs to be completed before this should run
+     * @param Tasks the tasks that needs to be completed before this should run
      */
-	public MandelContin(ArrayList<Task> tasks){
+	public MandelContin(ArrayList<Task<?>> tasks){
         super(tasks);
 		this.tasks = tasks;
 		this.simple = false;
 		counter = tasks.size();
-		results = new ArrayList<Result>();
+		results = new ArrayList<Result<MandelResult>>();
 		simple = true;
 	}
 
@@ -64,13 +64,13 @@ public class MandelContin extends ContinuationTaskImpl {
 				curY++;
 			}
 		}
-		Result res = new MandelResult(count, getTaskIdentifier());
+		Result<MandelResult> res = new MandelResult(count, getTaskIdentifier());
 		res.setTaskRunTime(getTaskRunTime());
 		return  createResult(res);
 	}
 
 	@Override
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task<?>> getTasks() {
 		return tasks;
 	}
 

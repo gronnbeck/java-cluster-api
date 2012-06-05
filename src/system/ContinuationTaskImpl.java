@@ -9,13 +9,14 @@ import java.util.List;
 
 public abstract class ContinuationTaskImpl extends TaskImpl implements ContinuationTask {
 
-    private long elapsedTime;
-    protected ArrayList<Result> results;
-    protected ArrayList<Task> tasks;
+	private static final long serialVersionUID = 7072306963725001247L;
+	private long elapsedTime;
+    protected ArrayList<Result<?>> results;
+    protected ArrayList<Task<?>> tasks;
     protected boolean simple;
 
-    public ContinuationTaskImpl(ArrayList<Task> tasks) {
-        results = new ArrayList<Result>();
+    public ContinuationTaskImpl(ArrayList<Task<?>> tasks) {
+        results = new ArrayList<Result<?>>();
         this.tasks = tasks;
         elapsedTime = 0;
     }
@@ -26,10 +27,10 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     }
 
     @Override
-    public List<Task> markAsCached(int n) {
-        List<Task> cached = new ArrayList<Task>();
+    public List<Task<?>> markAsCached(int n) {
+        List<Task<?>> cached = new ArrayList<Task<?>>();
         for (int i = 1; i <= n; i ++) {
-            Task task = tasks.get(i-1);
+            Task<?> task = tasks.get(i-1);
             task.setCached(true);
             cached.add(task);
         }
@@ -37,9 +38,9 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     }
 
     @Override
-    public List<Task> getCachedTasks(){
-        List<Task> cached = new ArrayList<Task>();
-        for (Task task : tasks) {
+    public List<Task<?>> getCachedTasks(){
+        List<Task<?>> cached = new ArrayList<Task<?>>();
+        for (Task<?> task : tasks) {
             if (task.getCached()) cached.add(task);
         }
         return cached;
@@ -48,7 +49,7 @@ public abstract class ContinuationTaskImpl extends TaskImpl implements Continuat
     @Override
     public synchronized long getTaskRunTime() {
         long subRuntime = 0;
-        for (Result result : results) {
+        for (Result<?> result : results) {
           subRuntime += result.getTaskRunTime();
         }
         return elapsedTime + subRuntime;

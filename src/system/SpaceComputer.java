@@ -9,6 +9,8 @@ import api.Task;
 
 public class SpaceComputer extends ComputerProxy implements Runnable{
 	
+	private static final long serialVersionUID = -8426092720356883475L;
+
 	public SpaceComputer(Computer comp, Space space) throws RemoteException {
 		super (comp,space);
 		//Thread t = new Thread(this);
@@ -20,9 +22,9 @@ public class SpaceComputer extends ComputerProxy implements Runnable{
 	public void run(){
 		do{
 			try {
-                Task task = space.takeSimpleTask();
+                Task<?> task = space.takeSimpleTask();
                 try {
-                	Result r = execute(task);
+                	Result<?> r = execute(task);
                     space.putResult(r);
                 } catch (RemoteException e) {
                     System.out.println("WTF!?");
@@ -31,7 +33,6 @@ public class SpaceComputer extends ComputerProxy implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();            // don't know how we shall handle this one, yet...
             } catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         } while(true);

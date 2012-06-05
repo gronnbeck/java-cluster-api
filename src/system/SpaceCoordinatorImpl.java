@@ -13,11 +13,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpaceCoordinatorImpl extends UnicastRemoteObject implements SpaceCoordinator {
 
-    private List<Space> spaces;
-    private BlockingQueue<Result> resultQ;
+	private static final long serialVersionUID = -6142857838122685348L;
+	private List<Space> spaces;
+    private BlockingQueue<Result<?>> resultQ;
    // private ConcurrentMap<String, BlockingQueue<Result>> resultQs;
+    private Shared<?> shared;
     private long startTime;
-    private Shared shared;
     private String jobid;
     private Computer computer;
     
@@ -25,7 +26,7 @@ public class SpaceCoordinatorImpl extends UnicastRemoteObject implements SpaceCo
     protected SpaceCoordinatorImpl() throws RemoteException {
         super();
         spaces = new ArrayList<Space>();
-        resultQ = new LinkedBlockingQueue<Result>();
+        resultQ = new LinkedBlockingQueue<Result<?>>();
         startTime = System.nanoTime();
     }
 
@@ -63,7 +64,6 @@ public class SpaceCoordinatorImpl extends UnicastRemoteObject implements SpaceCo
             System.out.println("SpaceCoordinator is online!");
 
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

@@ -8,7 +8,7 @@ public interface ContinuationTask extends Task {
      * Get all the tasks needed to solve this problem
      * @return a lists of tasks needed for this continuation to execute
      */
-    ArrayList<Task> getTasks();
+    ArrayList<Task<?>> getTasks();
 
     /**
      * Used to control if the task is ready to execute
@@ -41,12 +41,12 @@ public interface ContinuationTask extends Task {
      * @param n the number of tasks that is cached
      * @return a list of the tasks that are marked as cached will be returned
      */
-    List<Task> markAsCached(int n);
+    List<Task<?>> markAsCached(int n);
 
     /**
      * Gets the Tasks of a Continuation task which is marked as cached
      * @return a list of tasks that are marked as cached
      */
-    List<Task> getCachedTasks();
+    List<Task<?>> getCachedTasks();
 
 }

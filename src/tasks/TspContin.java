@@ -3,26 +3,23 @@ package tasks;
 import api.*;
 import system.ContinuationTaskImpl;
 import system.PruneResult;
-import system.TaskImpl;
-
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TspContin extends ContinuationTaskImpl {
 
-
-    private HashMap<String, Task> taskMap;
+	private static final long serialVersionUID = 8239162150170318930L;
+	private HashMap<String, Task<?>> taskMap;
     private int currentCity;
 
 
-	public TspContin(int currentCity, ArrayList<Task> tasks) {
+	public TspContin(int currentCity, ArrayList<Task<?>> tasks) {
         super(tasks);
         this.currentCity = currentCity;
-        results = new ArrayList<Result>();
+        results = new ArrayList<Result<?>>();
         this.tasks = tasks;
-        taskMap = new HashMap<String, Task>();
-        for (Task t : tasks) {
+        taskMap = new HashMap<String, Task<?>>();
+        for (Task<?> t : tasks) {
             taskMap.put(t.getTaskIdentifier(), t);
         }
         simple = true;
@@ -30,7 +27,7 @@ public class TspContin extends ContinuationTaskImpl {
     }
 
     @Override
-    public  ArrayList<Task> getTasks() {
+    public  ArrayList<Task<?>> getTasks() {
         return tasks;       // this is bad... i think
     }
 
@@ -40,7 +37,7 @@ public class TspContin extends ContinuationTaskImpl {
     }
 
     @Override
-    public synchronized void ready(Result result) {
+    public synchronized void ready(Result<?> result) {
         if (taskMap.containsKey(result.getTaskIdentifier())) {
             if (!(result instanceof PruneResult)) {
                 results.add(result);
@@ -52,16 +49,16 @@ public class TspContin extends ContinuationTaskImpl {
     @Override
     public Result<TspResult> execute() {
 
-        Result minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE);
+        Result<?> minRes = new TspResult(new ArrayList<Integer>(), Double.MAX_VALUE);
         double minCost = Double.MAX_VALUE;
 
-        for (Result currentResult : results) {
+        for (Result<?> currentResult : results) {
             if (minRes == null) {
                 minRes = currentResult;
                 minCost = ((Pair<Double, ArrayList<Integer>>)minRes.getTaskReturnValue()).getLeft();
                 continue;
             }
-            double currentCost =  ((Pair<Double, ArrayList<Integer>>)currentResult.getTaskReturnValue()).getLeft();
+            double currentCost = ((Pair<Double, ArrayList<Integer>>)currentResult.getTaskReturnValue()).getLeft();
 
             if (currentCost < minCost) {
                 minRes = currentResult;
