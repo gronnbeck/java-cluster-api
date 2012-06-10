@@ -2,6 +2,7 @@ package system;
 
 import api.*;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -12,6 +13,7 @@ public class SpaceProxy implements Space, Executor, Runnable {
 	private static final long serialVersionUID = 8009236881689702203L;
 	private BlockingQueue<Runnable> tasks;
     private Space space;
+    private HashMap<String, HashMap<String, Object>> computerStats;
 
     public SpaceProxy (Space space) {
         this.space = space;
@@ -256,7 +258,11 @@ public class SpaceProxy implements Space, Executor, Runnable {
                 e.printStackTrace();
             }
         }
-
     }
+
+	@Override
+	public JobInfo getJobInfo(String jobId, boolean askOtherSpaces) throws RemoteException {
+		return space.getJobInfo(jobId, false);
+	}
 
 }

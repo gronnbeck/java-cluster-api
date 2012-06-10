@@ -1,7 +1,6 @@
 package system;
 
 import java.rmi.RemoteException;
-
 import api.Computer;
 import api.Result;
 import api.Space;
@@ -15,8 +14,8 @@ public class SpaceComputer extends ComputerProxy implements Runnable{
 		super (comp,space);
 		//Thread t = new Thread(this);
 		//t.start();
-		
 	}
+	
 	
 	@Override
 	public void run(){

@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -390,6 +391,28 @@ public class SpaceImpl extends UnicastRemoteObject implements Space, Runnable, R
             }
         }
 
+    }
+    
+    
+    public JobInfo getJobInfo(String jobId, boolean askSpaces) throws RemoteException {
+    	
+    	JobInfo jobInfo = new JobInfo();
+    	
+    	if (askSpaces) {
+    		for (Space space : spaces.values()) {
+    			JobInfo j = space.getJobInfo(jobId, false);
+    			for (HashMap<String, Object> hashMap : j) {
+					jobInfo.add(hashMap);
+				}
+    		}
+    	}
+    	
+    	// Get info from own computers
+    	for (Computer computer : computers) {
+    		jobInfo.add(computer.getJobInfo(jobId));
+		}
+    	
+    	return jobInfo;
     }
 
 

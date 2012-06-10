@@ -273,10 +273,21 @@ public class ComputerProxy extends UnicastRemoteObject implements Runnable, Comp
         }
     }
 
-
+ 
     @Override
     public void propagateTaskEvent(TaskEvent<?> taskEvent) throws RemoteException {
         System.out.println("This method is never called, why would your propagate an event to a task?");
         //computer.propagateTaskEvent(taskEvent);
     }
+    
+    public HashMap<String, Object> getJobInfo(String jobId) throws RemoteException {
+    	return this.computer.getJobInfo(jobId);
+    }
+    
+    
+    public String getId() throws RemoteException{
+    	return computer.getId();
+    }
+    
+    
 }

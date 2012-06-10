@@ -2,7 +2,6 @@ package system;
 
 import api.Computer;
 import api.Task;
-
 import java.rmi.RemoteException;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -67,6 +66,7 @@ class WorkStealer implements Runnable {
     @Override
     public void run() {
         do {
+        	//TODO: Why do we do this? Is this necessary?
             try {
                 Thread.sleep(getBackOff());
             } catch (InterruptedException e) { e.printStackTrace(); }

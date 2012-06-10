@@ -2,8 +2,8 @@ package api;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.List;
+import system.JobInfo;
 
 public interface Space extends Remote, Computer2Space, Task2Space, TaskEventHandler {
     public static String SERVICE_NAME = "Space";
@@ -81,5 +81,13 @@ public interface Space extends Remote, Computer2Space, Task2Space, TaskEventHand
      * @throws InterruptedException
      */
     Result<?> getResult(String jobId) throws RemoteException, InterruptedException;
+    
+    
+    /**
+     * Asks the space to return all info about a given job
+     * @return
+     * @throws RemoteException
+     */
+     JobInfo getJobInfo(String jobId, boolean askOtherSpaces) throws RemoteException;
 
 }

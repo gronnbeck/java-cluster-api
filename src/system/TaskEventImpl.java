@@ -5,7 +5,7 @@ import api.TaskEvent;
 public class TaskEventImpl implements TaskEvent<Object> {
 
 	private static final long serialVersionUID = 6586230242298272950L;
-	private String ownerId;
+	private String ownerId;	
     private String jobId;
     private String type;
     private Object value;

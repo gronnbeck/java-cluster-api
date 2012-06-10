@@ -6,6 +6,7 @@ import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
 
+import system.JobInfo;
 import test.TestTask;
 
 import api.Space;
@@ -35,6 +36,9 @@ public class TestApplication {
 	        
 	        System.out.println("Waiting for result..");
 	        space.getResult(task.getJobId());
+	        
+	        JobInfo j = space.getJobInfo(task.getJobId(), true);
+	        System.out.println(j.toString());
 	        
 	        System.out.println("Result returned..\nTest application done.. ");
 

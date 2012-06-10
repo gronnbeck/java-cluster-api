@@ -1,6 +1,7 @@
 package client;
 
 import api.*;
+import system.JobInfo;
 import tasks.DoubleShared;
 import tasks.Pair;
 import tasks.TspHelpers;
@@ -112,8 +113,8 @@ public class Tsp {
                     {4,2}, //14
                     {4,3},
         		{4,4},
-        		{5,1},
-        		{5,2},
+//        		{5,1},
+//        		{5,2},
 //        		{5,3},
 //        		{5,4},
 //                {6,1},
@@ -145,9 +146,6 @@ public class Tsp {
         Double upperBound = findUpperBound(coord);
 
         space.setShared(new DoubleShared(upperBound, tspTask.getJobId()));
-        
-        Thread.sleep(1000); // Hack to fix setShared startup race condition
-
         System.out.println("Upperbound: " + upperBound);
         long runTime = System.currentTimeMillis();
 
@@ -163,6 +161,9 @@ public class Tsp {
         ArrayList<Integer> pathAsList = ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getRight();
         System.out.println("Path: " + pathAsList);
         System.out.println("Cost: " + ((Pair<Double, ArrayList<Integer>>)result.getTaskReturnValue()).getLeft());
+        
+        JobInfo j = space.getJobInfo(tspTask.getJobId(), true);
+        System.out.println(j.toString());
 
         int[] path = new int[pathAsList.size()];
         for (int i = 0; i < path.length; i++)

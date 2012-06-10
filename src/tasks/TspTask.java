@@ -15,7 +15,7 @@ public class TspTask extends TaskImpl implements Serializable  {
 	private static final long serialVersionUID = -3732706190242542809L;
 	
 	// TODO: make thos configureable... Buggy...
-    private static int levels = 2;
+    private static int levels = 1;
     private int tspBaseCase;
     private double[][] coordinates;
     private ArrayList<Integer> cities;

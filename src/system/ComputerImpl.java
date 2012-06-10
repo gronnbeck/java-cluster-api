@@ -14,20 +14,26 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	private Space space;
 	private ConcurrentHashMap<String, Shared<?>> sharedMap;
 	private Task<?> cached;
+	private UUID id;
+	
+	private HashMap<String, HashMap<String, Object>> computerStats;
 
 	public ComputerImpl(Space space) throws RemoteException {
 		super();
 		this.space = new SpaceProxy(space);
 		this.sharedMap = new ConcurrentHashMap<String, Shared<?>>();
+		this.computerStats = new HashMap<String, HashMap<String, Object>>();
+		id = UUID.randomUUID();
 	}
 
 	@Override
 	public Result<?> execute(Task<?> task) throws RemoteException {
-		long taskStartTime = System.nanoTime();
+		long taskStartTime = System.nanoTime();	
 		task.setComputer(this);
 
 		Result<?> result = task.execute();
-		result.setTaskRunTime(taskStartTime);
+		//result.setTaskRunTime(taskStartTime);
+		
 
 		// TODO This part can be more elegant
 		if (result instanceof ContinuationResult) {
@@ -37,7 +43,35 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 			List<Task<?>> cachedTasks = continuationTask.markAsCached(1);
 			cached = cachedTasks.get(0);
 		}
+		
+		addStats(task.getJobId(), System.nanoTime() - taskStartTime);
 		return result;
+	}
+	
+	/**
+	 * This method adds stats such as task execution time,
+	 * and number of tasks executed for a certain job.
+	 * @param jobId
+	 */
+	private void addStats(String jobId, long executionTime) {
+		
+		// Add a hashmap for a job if not already there
+		if (!this.computerStats.containsKey(jobId))
+			this.computerStats.put(jobId, new HashMap<String, Object>());
+
+		// Initialize data structure
+		HashMap<String, Object> jobHashMap = this.computerStats.get(jobId);
+		if (!jobHashMap.containsKey("tasksExecuted")) 
+			jobHashMap.put("tasksExecuted", 1);
+		
+		if (!jobHashMap.containsKey("jobExecutionTime")) 
+			jobHashMap.put("jobExecutionTime", executionTime);
+		
+		
+		// Add info to job hashmap
+		jobHashMap.put("tasksExecuted", (Integer)(jobHashMap.get("tasksExecuted")) + 1);
+		jobHashMap.put("jobExecutionTime", (Long)(jobHashMap.get("jobExecutionTime")) + executionTime);
+		
 	}
 
 	@Override
@@ -172,6 +206,24 @@ public class ComputerImpl extends UnicastRemoteObject implements Computer  {
 	@Override
 	public void propagateTaskEvent(TaskEvent<?> taskEvent) throws RemoteException {
 		space.propagateTaskEvent(taskEvent);
+	}
+
+	@Override
+	public HashMap<String, Object> getJobInfo(String jobId) throws RemoteException {
+		if (this.computerStats.containsKey(jobId)) {
+			return this.computerStats.get(jobId);
+		}
+		else{
+			HashMap<String, Object> emptyMap = new HashMap<String, Object>();
+			emptyMap.put("tasksExecuted", 0);
+			emptyMap.put("jobExecutionTime", 0L);
+			return emptyMap;
+		}
+	}
+
+	@Override
+	public String getId() throws RemoteException {
+		return this.id.toString();
 	}
 
 }

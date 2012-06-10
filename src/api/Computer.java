@@ -3,6 +3,7 @@ package api;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
 
 public interface Computer extends Remote, Serializable, TaskEventHandler {
@@ -45,6 +46,10 @@ public interface Computer extends Remote, Serializable, TaskEventHandler {
     public boolean want2Steal() throws RemoteException;
     public Task<?> stealTask() throws RemoteException, InterruptedException;
     void addTask(Task<?> task) throws RemoteException;
+    
+   public HashMap<String, Object> getJobInfo(String jobId) throws RemoteException;
+   
+   public String getId() throws RemoteException;
 
 
 }

@@ -1,6 +1,7 @@
 package client;
 
 import api.Space;
+import system.JobInfo;
 import tasks.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -38,6 +39,9 @@ public class Fib {
             FibResult result = (FibResult)space.getResult(fibTask.getJobId());
             System.out.println(NTH_NUMBER + "th number of fib: " + result.getTaskReturnValue());
             System.out.println("Client time: " + (System.nanoTime() - clientRunTime));
+            
+            JobInfo j = space.getJobInfo(fibTask.getJobId(), true);
+            System.out.println(j.toString());
             
         } catch (RemoteException e) {
             System.out.println("The spaced you connected to crashed during execution.");
