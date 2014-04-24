@@ -1,3 +1,6 @@
+# DISCLAIMER
+Do not use this API, it was just a school project, its slow, and unmaintained.
+
 JACAL 
 =====
 
